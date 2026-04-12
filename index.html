@@ -357,7 +357,8 @@
 
   function saveApiUrl() {
     const url = document.getElementById('apiUrlInput').value.trim();
-    if (!url.startsWith('https://script.google.com')) { showToast('❌ URL không hợp lệ!','err'); return; }
+    if (!url.includes('script.google.com')) { showToast('❌ URL không hợp lệ! Phải là link script.google.com','err'); return; }
+    if (!url.includes('/exec')) { showToast('❌ URL phải kết thúc bằng /exec','err'); return; }
     API_URL = url;
     localStorage.setItem(API_KEY, url);
     document.getElementById('setupBanner').classList.add('hidden');
@@ -378,17 +379,42 @@
 
   // ── API ────────────────────────────────────────────────────────
   async function loadAll() {
-    document.getElementById('cardGrid').innerHTML = `<div class="loading-state"><div class="spinner"></div><p>Đang tải từ Google Sheet…</p></div>`;
+    document.getElementById('cardGrid').innerHTML = '<div class="loading-state"><div class="spinner"></div><p>Đang tải từ Google Sheet…</p></div>';
     try {
-      const res  = await fetch(API_URL);
-      const data = await res.json();
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 15000);
+      const res  = await fetch(API_URL + '?t=' + Date.now(), { signal: controller.signal });
+      clearTimeout(timer);
+      const text = await res.text();
+      let data;
+      try { data = JSON.parse(text); }
+      catch(e) { throw new Error('Apps Script trả về dữ liệu không hợp lệ. Kiểm tra lại URL hoặc deploy lại.'); }
       if (data.error) throw new Error(data.error);
       recipes        = data.recipes || [];
       ingredientList = data.ingredientList || [];
       renderCards();
     } catch (err) {
-      document.getElementById('cardGrid').innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><h3>Không thể kết nối</h3><p style="font-size:13px;color:var(--red);margin-top:4px">${err.message}</p></div>`;
+      const msg = err.name === 'AbortError'
+        ? 'Kết nối quá chậm (timeout 15s). Thử lại hoặc kiểm tra Apps Script.'
+        : err.message;
+      document.getElementById('cardGrid').innerHTML =
+        '<div class="empty-state">' +
+          '<div class="empty-icon">⚠️</div>' +
+          '<h3>Không thể kết nối</h3>' +
+          '<p style="font-size:13px;color:var(--red);margin-top:4px">' + msg + '</p>' +
+          '<button class="btn btn-gold" style="margin-top:16px" onclick="loadAll()">🔄 Thử lại</button>' +
+          '<button class="btn btn-ghost" style="margin-top:8px" onclick="resetConnection()">🔗 Đổi URL</button>' +
+        '</div>';
     }
+  }
+
+  function resetConnection() {
+    localStorage.removeItem(API_KEY);
+    API_URL = '';
+    document.getElementById('apiUrlInput').value = '';
+    document.getElementById('setupBanner').classList.remove('hidden');
+    document.getElementById('cardGrid').innerHTML = '';
+    renderStats();
   }
 
   async function apiPost(body) {
