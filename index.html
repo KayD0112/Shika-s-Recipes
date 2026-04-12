@@ -147,12 +147,12 @@
 
     /* ── Ingredient combobox rows ── */
     .ingredient-rows { display:flex;flex-direction:column;gap:8px; }
-    .ingredient-row { display:flex;gap:8px;align-items:flex-start;width:100%; }
-    .ing-combo-wrap { flex:1 1 0;min-width:0;position:relative; }
-    .ing-name-input { width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:12px 36px 12px 14px;border-radius:10px;outline:none;transition:border-color .2s,box-shadow .2s; }
+    .ingredient-row { display:grid;grid-template-columns:1fr 110px 36px;gap:8px;align-items:start;position:relative; }
+    .ing-combo-wrap { position:relative;min-width:0; }
+    .ing-name-input { display:block;width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:12px 32px 12px 14px;border-radius:10px;outline:none;transition:border-color .2s,box-shadow .2s;box-sizing:border-box; }
     .ing-name-input:focus { border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.1); }
     .ing-name-input::placeholder { color:var(--text-muted); }
-    .ing-combo-arrow { position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none;font-size:11px; }
+    .ing-combo-arrow { position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none;font-size:10px; }
     .ing-dropdown { position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--surface);border:1px solid var(--gold);border-radius:10px;z-index:1000;max-height:200px;overflow-y:auto;display:none;box-shadow:0 8px 32px rgba(0,0,0,.5);scrollbar-width:thin;scrollbar-color:var(--border) transparent; }
     .ing-dropdown.show { display:block; }
     .ing-dropdown-item { padding:10px 14px;font-size:13px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px;transition:background .1s; }
@@ -160,10 +160,10 @@
     .ing-dropdown-item .ing-item-name { color:var(--text); }
     .ing-dropdown-item .ing-item-unit { color:var(--text-muted);font-size:12px;flex-shrink:0; }
     .ing-dropdown-empty { padding:12px 14px;font-size:13px;color:var(--text-muted);font-style:italic; }
-    .ing-amount-input { width:110px;flex-shrink:0;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:12px 10px;border-radius:10px;outline:none;transition:border-color .2s; }
+    .ing-amount-input { display:block;width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:12px 8px;border-radius:10px;outline:none;transition:border-color .2s;box-sizing:border-box; }
     .ing-amount-input:focus { border-color:var(--gold); }
     .ing-amount-input::placeholder { color:var(--text-muted); }
-    .btn-remove-ing { width:36px;height:44px;flex-shrink:0;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;transition:all .15s;font-size:16px; }
+    .btn-remove-ing { display:block;width:36px;height:44px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;transition:all .15s;font-size:16px; }
     .btn-remove-ing:hover { border-color:var(--red);color:var(--red); }
     .btn-add-ing { border:1px dashed var(--border);background:transparent;color:var(--text-muted);font-family:'DM Sans',sans-serif;font-size:13px;padding:10px;border-radius:10px;cursor:pointer;transition:all .2s;width:100%;margin-top:4px; }
     .btn-add-ing:hover { border-color:var(--gold);color:var(--gold);background:var(--gold-dim); }
