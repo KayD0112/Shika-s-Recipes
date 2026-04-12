@@ -550,7 +550,7 @@
         '<div class="ing-dropdown"></div>' +
       '</div>' +
       '<input class="ing-amount-input" placeholder="Số lượng" />' +
-      '<button class="btn-remove-ing" onclick="this.closest('[data-ing]').remove()">&#8722;</button>';
+      '<button class="btn-remove-ing" onclick="this.parentElement.parentElement.remove()">&#8722;</button>';
     row.setAttribute('data-ing','1');
     document.getElementById('ingredientRows').appendChild(row);
 
