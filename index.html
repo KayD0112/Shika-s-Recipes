@@ -11,180 +11,187 @@
       --bg: #0e0c0a; --surface: #1a1612; --surface2: #231e18;
       --border: #3a3028; --gold: #c9a84c; --gold-light: #e8c97e;
       --gold-dim: rgba(201,168,76,0.15); --text: #f0e8d8;
-      --text-muted: #8a7d6a; --red: #d45c4a; --green: #5aaa82; --radius: 14px;
+      --text-muted: #8a7d6a; --red: #d45c4a; --green: #5aaa82;
+      --green-dim: rgba(90,170,130,0.15); --radius: 14px;
     }
     html { scroll-behavior: smooth; }
     body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
-    body::before {
-      content: ''; position: fixed; inset: 0; z-index: 0; opacity: .03;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-      pointer-events: none;
-    }
+    body::before { content:'';position:fixed;inset:0;z-index:0;opacity:.03;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");pointer-events:none; }
 
     /* ── Header ── */
-    header {
-      position: relative; z-index: 10; padding: 48px 40px 32px;
-      border-bottom: 1px solid var(--border);
-      background: linear-gradient(180deg, rgba(201,168,76,.06) 0%, transparent 100%);
-      display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap;
-    }
-    .logo-block { display: flex; flex-direction: column; gap: 4px; }
-    .logo-eyebrow { font-size: 10px; letter-spacing: .25em; text-transform: uppercase; color: var(--gold); font-weight: 500; }
-    .logo { font-family: 'Playfair Display', serif; font-size: clamp(36px, 6vw, 64px); line-height: 1; color: var(--gold-light); text-shadow: 0 0 60px rgba(201,168,76,.25); }
-    .logo em { font-style: italic; color: var(--text-muted); }
-    .header-actions { display: flex; gap: 12px; align-items: center; }
+    header { position:relative;z-index:10;padding:48px 40px 32px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(201,168,76,.06) 0%,transparent 100%);display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap; }
+    .logo-block { display:flex;flex-direction:column;gap:4px; }
+    .logo-eyebrow { font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);font-weight:500; }
+    .logo { font-family:'Playfair Display',serif;font-size:clamp(36px,6vw,64px);line-height:1;color:var(--gold-light);text-shadow:0 0 60px rgba(201,168,76,.25); }
+    .logo em { font-style:italic;color:var(--text-muted); }
+    .header-actions { display:flex;gap:12px;align-items:center;flex-wrap:wrap; }
 
     /* ── Search ── */
-    .search-wrap { position: relative; }
-    .search-wrap svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--text-muted); pointer-events: none; }
-    .search-input {
-      background: var(--surface2); border: 1px solid var(--border);
-      color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px;
-      padding: 10px 16px 10px 40px; border-radius: 99px; width: 220px; outline: none;
-      transition: border-color .2s, box-shadow .2s;
-    }
-    .search-input::placeholder { color: var(--text-muted); }
-    .search-input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,76,.12); }
+    .search-wrap { position:relative; }
+    .search-wrap svg { position:absolute;left:14px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--text-muted);pointer-events:none; }
+    .search-input { background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:10px 16px 10px 40px;border-radius:99px;width:220px;outline:none;transition:border-color .2s,box-shadow .2s; }
+    .search-input::placeholder { color:var(--text-muted); }
+    .search-input:focus { border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.12); }
+
+    /* ── Tabs ── */
+    .page-tabs { display:flex;gap:4px;background:var(--surface2);padding:4px;border-radius:99px;border:1px solid var(--border); }
+    .page-tab { padding:7px 18px;border-radius:99px;font-size:13px;font-weight:500;border:none;background:transparent;color:var(--text-muted);cursor:pointer;transition:all .2s; }
+    .page-tab.active { background:var(--gold);color:#1a1200; }
 
     /* ── Buttons ── */
-    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 22px; border-radius: 99px; border: none; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: all .2s; white-space: nowrap; }
-    .btn-gold { background: var(--gold); color: #1a1200; }
-    .btn-gold:hover { background: var(--gold-light); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(201,168,76,.3); }
-    .btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
-    .btn-ghost:hover { border-color: var(--text-muted); color: var(--text); }
-    .btn-danger { background: transparent; color: var(--red); border: 1px solid transparent; padding: 6px 10px; border-radius: 8px; }
-    .btn-danger:hover { background: rgba(212,92,74,.12); border-color: rgba(212,92,74,.3); }
+    .btn { display:inline-flex;align-items:center;gap:8px;padding:11px 22px;border-radius:99px;border:none;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s;white-space:nowrap; }
+    .btn-gold { background:var(--gold);color:#1a1200; }
+    .btn-gold:hover { background:var(--gold-light);transform:translateY(-1px);box-shadow:0 8px 24px rgba(201,168,76,.3); }
+    .btn-ghost { background:transparent;color:var(--text-muted);border:1px solid var(--border); }
+    .btn-ghost:hover { border-color:var(--text-muted);color:var(--text); }
+    .btn-danger { background:transparent;color:var(--red);border:1px solid transparent;padding:6px 10px;border-radius:8px; }
+    .btn-danger:hover { background:rgba(212,92,74,.12);border-color:rgba(212,92,74,.3); }
+    .btn-green { background:var(--green);color:#fff; }
+    .btn-green:hover { background:#6dbf94;transform:translateY(-1px); }
 
     /* ── Main ── */
-    main { position: relative; z-index: 1; padding: 40px; max-width: 1400px; margin: 0 auto; }
+    main { position:relative;z-index:1;padding:40px;max-width:1400px;margin:0 auto; }
+
+    /* ── Pages ── */
+    .page { display:none; }
+    .page.active { display:block; }
 
     /* ── Setup Banner ── */
-    .setup-banner {
-      background: linear-gradient(135deg, rgba(201,168,76,.12), rgba(201,168,76,.04));
-      border: 1px solid rgba(201,168,76,.3); border-radius: var(--radius);
-      padding: 24px 28px; margin-bottom: 32px;
-      display: flex; align-items: flex-start; gap: 16px;
-    }
-    .setup-banner.hidden { display: none; }
-    .setup-icon { font-size: 28px; flex-shrink: 0; margin-top: 2px; }
-    .setup-content { flex: 1; }
-    .setup-content h3 { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--gold-light); margin-bottom: 6px; }
-    .setup-content p { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 12px; }
-    .setup-input-row { display: flex; gap: 10px; flex-wrap: wrap; }
-    .setup-input {
-      flex: 1; min-width: 280px; background: var(--surface2); border: 1px solid var(--border);
-      color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px;
-      padding: 10px 14px; border-radius: 10px; outline: none;
-      transition: border-color .2s;
-    }
-    .setup-input:focus { border-color: var(--gold); }
-    .setup-input::placeholder { color: var(--text-muted); }
+    .setup-banner { background:linear-gradient(135deg,rgba(201,168,76,.12),rgba(201,168,76,.04));border:1px solid rgba(201,168,76,.3);border-radius:var(--radius);padding:24px 28px;margin-bottom:32px;display:flex;align-items:flex-start;gap:16px; }
+    .setup-banner.hidden { display:none; }
+    .setup-icon { font-size:28px;flex-shrink:0;margin-top:2px; }
+    .setup-content { flex:1; }
+    .setup-content h3 { font-family:'Playfair Display',serif;font-size:18px;color:var(--gold-light);margin-bottom:6px; }
+    .setup-content p { font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:12px; }
+    .setup-input-row { display:flex;gap:10px;flex-wrap:wrap; }
+    .setup-input { flex:1;min-width:280px;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:10px 14px;border-radius:10px;outline:none;transition:border-color .2s; }
+    .setup-input:focus { border-color:var(--gold); }
+    .setup-input::placeholder { color:var(--text-muted); }
 
     /* ── Loading ── */
-    .loading-state {
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 16px; padding: 80px; color: var(--text-muted); text-align: center;
-    }
-    .spinner {
-      width: 40px; height: 40px; border: 3px solid var(--border);
-      border-top-color: var(--gold); border-radius: 50%;
-      animation: spin .8s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-state { display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:80px;color:var(--text-muted);text-align:center; }
+    .spinner { width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
 
-    /* ── Filter / Stats ── */
-    .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 36px; }
-    .filter-tab { padding: 7px 18px; border-radius: 99px; font-size: 13px; font-weight: 500; border: 1px solid var(--border); background: transparent; color: var(--text-muted); cursor: pointer; transition: all .2s; }
-    .filter-tab:hover { border-color: var(--gold); color: var(--gold); }
-    .filter-tab.active { background: var(--gold-dim); border-color: var(--gold); color: var(--gold); }
-    .stats { display: flex; gap: 32px; margin-bottom: 40px; flex-wrap: wrap; }
-    .stat { display: flex; flex-direction: column; gap: 2px; }
-    .stat-num { font-family: 'Playfair Display', serif; font-size: 32px; color: var(--gold-light); line-height: 1; }
-    .stat-label { font-size: 12px; color: var(--text-muted); letter-spacing: .05em; }
+    /* ── Stats / Filters ── */
+    .filter-bar { display:flex;gap:8px;flex-wrap:wrap;margin-bottom:36px; }
+    .filter-tab { padding:7px 18px;border-radius:99px;font-size:13px;font-weight:500;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;transition:all .2s; }
+    .filter-tab:hover { border-color:var(--gold);color:var(--gold); }
+    .filter-tab.active { background:var(--gold-dim);border-color:var(--gold);color:var(--gold); }
+    .stats { display:flex;gap:32px;margin-bottom:40px;flex-wrap:wrap; }
+    .stat { display:flex;flex-direction:column;gap:2px; }
+    .stat-num { font-family:'Playfair Display',serif;font-size:32px;color:var(--gold-light);line-height:1; }
+    .stat-label { font-size:12px;color:var(--text-muted);letter-spacing:.05em; }
 
-    /* ── Grid / Cards ── */
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: transform .25s, box-shadow .25s, border-color .25s; display: flex; flex-direction: column; animation: fadeUp .4s ease both; }
-    .card:hover { transform: translateY(-4px); box-shadow: 0 20px 48px rgba(0,0,0,.5); border-color: var(--gold); }
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-    .card-badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; border-radius: 99px; background: var(--gold-dim); color: var(--gold); border: 1px solid rgba(201,168,76,.2); }
-    .card-header { padding: 24px 24px 0; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
-    .card-icon { width: 48px; height: 48px; border-radius: 12px; background: var(--gold-dim); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
-    .card-title { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--text); margin-top: 16px; padding: 0 24px; line-height: 1.3; }
-    .card-desc { font-size: 13px; color: var(--text-muted); padding: 8px 24px 0; line-height: 1.6; flex: 1; }
-    .card-divider { height: 1px; background: var(--border); margin: 20px 24px; }
-    .card-section-label { font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--text-muted); padding: 0 24px 10px; font-weight: 500; }
-    .ingredients-list { list-style: none; padding: 0 24px; display: flex; flex-direction: column; gap: 6px; }
-    .ingredients-list li { display: flex; align-items: center; gap: 10px; font-size: 13px; }
-    .ingredients-list li::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); flex-shrink: 0; opacity: .7; }
-    .card-steps { padding: 0 24px; font-size: 13px; color: var(--text-muted); line-height: 1.7; white-space: pre-wrap; }
-    .card-footer { padding: 16px 24px 20px; display: flex; justify-content: flex-end; gap: 8px; margin-top: auto; }
+    /* ── Recipe Grid / Cards ── */
+    .grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px; }
+    .card { background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:transform .25s,box-shadow .25s,border-color .25s;display:flex;flex-direction:column;animation:fadeUp .4s ease both; }
+    .card:hover { transform:translateY(-4px);box-shadow:0 20px 48px rgba(0,0,0,.5);border-color:var(--gold); }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)} }
+    .card-badge { display:inline-flex;align-items:center;gap:6px;padding:5px 12px;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;border-radius:99px;background:var(--gold-dim);color:var(--gold);border:1px solid rgba(201,168,76,.2); }
+    .card-header { padding:24px 24px 0;display:flex;justify-content:space-between;align-items:flex-start;gap:12px; }
+    .card-icon { width:48px;height:48px;border-radius:12px;background:var(--gold-dim);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0; }
+    .card-title { font-family:'Playfair Display',serif;font-size:20px;color:var(--text);margin-top:16px;padding:0 24px;line-height:1.3; }
+    .card-desc { font-size:13px;color:var(--text-muted);padding:8px 24px 0;line-height:1.6;flex:1; }
+    .card-divider { height:1px;background:var(--border);margin:20px 24px; }
+    .card-section-label { font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--text-muted);padding:0 24px 10px;font-weight:500; }
+    .ingredients-list { list-style:none;padding:0 24px;display:flex;flex-direction:column;gap:6px; }
+    .ingredients-list li { display:flex;align-items:center;gap:10px;font-size:13px; }
+    .ingredients-list li::before { content:'';width:6px;height:6px;border-radius:50%;background:var(--gold);flex-shrink:0;opacity:.7; }
+    .card-steps { padding:0 24px;font-size:13px;color:var(--text-muted);line-height:1.7;white-space:pre-wrap; }
+    .card-footer { padding:16px 24px 20px;display:flex;justify-content:flex-end;gap:8px;margin-top:auto; }
 
     /* ── Empty ── */
-    .empty-state { grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 80px 24px; text-align: center; color: var(--text-muted); }
-    .empty-icon { font-size: 56px; opacity: .4; }
-    .empty-state h3 { font-family: 'Playfair Display', serif; font-size: 24px; color: var(--text); }
+    .empty-state { grid-column:1/-1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:80px 24px;text-align:center;color:var(--text-muted); }
+    .empty-icon { font-size:56px;opacity:.4; }
+    .empty-state h3 { font-family:'Playfair Display',serif;font-size:24px;color:var(--text); }
+
+    /* ── Ingredients Page ── */
+    .ing-page-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:16px; }
+    .ing-page-header h2 { font-family:'Playfair Display',serif;font-size:28px;color:var(--gold-light); }
+    .ing-search { background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:10px 16px;border-radius:99px;width:220px;outline:none;transition:border-color .2s; }
+    .ing-search:focus { border-color:var(--green); }
+    .ing-search::placeholder { color:var(--text-muted); }
+    .ing-add-row { display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap; }
+    .ing-add-row input { background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:10px 14px;border-radius:10px;outline:none;transition:border-color .2s;flex:1;min-width:160px; }
+    .ing-add-row input:focus { border-color:var(--green);box-shadow:0 0 0 3px rgba(90,170,130,.1); }
+    .ing-add-row input::placeholder { color:var(--text-muted); }
+    .ing-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px; }
+    .ing-card { background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;transition:border-color .2s; }
+    .ing-card:hover { border-color:var(--green); }
+    .ing-card-info { display:flex;flex-direction:column;gap:3px; }
+    .ing-card-name { font-size:14px;font-weight:500; }
+    .ing-card-unit { font-size:12px;color:var(--text-muted); }
+    .ing-delete { background:transparent;border:none;color:var(--text-muted);cursor:pointer;font-size:16px;padding:4px 6px;border-radius:6px;transition:all .15s; }
+    .ing-delete:hover { color:var(--red);background:rgba(212,92,74,.1); }
+    .ing-count { font-size:12px;color:var(--text-muted);margin-bottom:16px; }
 
     /* ── Modal ── */
-    .modal-overlay { position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,.7); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; padding: 24px; opacity: 0; pointer-events: none; transition: opacity .25s; }
-    .modal-overlay.open { opacity: 1; pointer-events: all; }
-    .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto; transform: translateY(20px) scale(.97); transition: transform .25s; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
-    .modal-overlay.open .modal { transform: translateY(0) scale(1); }
-    .modal-header { padding: 28px 28px 0; display: flex; justify-content: space-between; align-items: center; }
-    .modal-title { font-family: 'Playfair Display', serif; font-size: 26px; color: var(--gold-light); }
-    .modal-close { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border); background: transparent; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: all .15s; }
-    .modal-close:hover { border-color: var(--red); color: var(--red); }
-    .modal-body { padding: 24px 28px 28px; display: flex; flex-direction: column; gap: 20px; }
-    .field { display: flex; flex-direction: column; gap: 8px; }
-    .field label { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--text-muted); font-weight: 500; }
-    .field input, .field textarea, .field select { background: var(--surface2); border: 1px solid var(--border); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; padding: 12px 14px; border-radius: 10px; outline: none; transition: border-color .2s, box-shadow .2s; width: 100%; resize: vertical; }
-    .field input::placeholder, .field textarea::placeholder { color: var(--text-muted); }
-    .field input:focus, .field textarea:focus, .field select:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,76,.1); }
-    .field select option { background: var(--surface2); }
-    .field textarea { min-height: 80px; }
-    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    .ingredient-rows { display: flex; flex-direction: column; gap: 8px; }
-    .ingredient-row { display: flex; gap: 8px; }
-    .ingredient-row input { flex: 1; }
-    .ingredient-row .ing-unit { width: 90px; flex-shrink: 0; }
-    .btn-add-ing { border: 1px dashed var(--border); background: transparent; color: var(--text-muted); font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 10px; border-radius: 10px; cursor: pointer; transition: all .2s; width: 100%; margin-top: 4px; }
-    .btn-add-ing:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-dim); }
-    .btn-remove-ing { width: 34px; flex-shrink: 0; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); cursor: pointer; transition: all .15s; font-size: 16px; }
-    .btn-remove-ing:hover { border-color: var(--red); color: var(--red); }
-    .modal-footer { padding: 0 28px 28px; display: flex; justify-content: flex-end; gap: 10px; }
+    .modal-overlay { position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .25s; }
+    .modal-overlay.open { opacity:1;pointer-events:all; }
+    .modal { background:var(--surface);border:1px solid var(--border);border-radius:20px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;transform:translateY(20px) scale(.97);transition:transform .25s;scrollbar-width:thin;scrollbar-color:var(--border) transparent; }
+    .modal-overlay.open .modal { transform:translateY(0) scale(1); }
+    .modal-header { padding:28px 28px 0;display:flex;justify-content:space-between;align-items:center; }
+    .modal-title { font-family:'Playfair Display',serif;font-size:26px;color:var(--gold-light); }
+    .modal-close { width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:all .15s; }
+    .modal-close:hover { border-color:var(--red);color:var(--red); }
+    .modal-body { padding:24px 28px 28px;display:flex;flex-direction:column;gap:20px; }
+    .field { display:flex;flex-direction:column;gap:8px; }
+    .field label { font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);font-weight:500; }
+    .field input,.field textarea,.field select { background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:12px 14px;border-radius:10px;outline:none;transition:border-color .2s,box-shadow .2s;width:100%;resize:vertical; }
+    .field input::placeholder,.field textarea::placeholder { color:var(--text-muted); }
+    .field input:focus,.field textarea:focus,.field select:focus { border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.1); }
+    .field select option { background:var(--surface2); }
+    .field textarea { min-height:80px; }
+    .field-row { display:grid;grid-template-columns:1fr 1fr;gap:16px; }
 
-    /* ── Saving indicator ── */
-    .saving-badge {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 4px 12px; border-radius: 99px; font-size: 12px;
-      background: var(--gold-dim); color: var(--gold); border: 1px solid rgba(201,168,76,.2);
-      opacity: 0; transition: opacity .3s;
-    }
-    .saving-badge.show { opacity: 1; }
+    /* ── Ingredient combobox rows ── */
+    .ingredient-rows { display:flex;flex-direction:column;gap:8px; }
+    .ingredient-row { display:flex;gap:8px;align-items:flex-start; }
+    .ing-combo-wrap { flex:1;position:relative; }
+    .ing-name-input { width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:12px 36px 12px 14px;border-radius:10px;outline:none;transition:border-color .2s,box-shadow .2s; }
+    .ing-name-input:focus { border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.1); }
+    .ing-name-input::placeholder { color:var(--text-muted); }
+    .ing-combo-arrow { position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none;font-size:11px; }
+    .ing-dropdown { position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--surface);border:1px solid var(--gold);border-radius:10px;z-index:1000;max-height:200px;overflow-y:auto;display:none;box-shadow:0 8px 32px rgba(0,0,0,.5);scrollbar-width:thin;scrollbar-color:var(--border) transparent; }
+    .ing-dropdown.show { display:block; }
+    .ing-dropdown-item { padding:10px 14px;font-size:13px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px;transition:background .1s; }
+    .ing-dropdown-item:hover,.ing-dropdown-item.focused { background:var(--gold-dim); }
+    .ing-dropdown-item .ing-item-name { color:var(--text); }
+    .ing-dropdown-item .ing-item-unit { color:var(--text-muted);font-size:12px;flex-shrink:0; }
+    .ing-dropdown-empty { padding:12px 14px;font-size:13px;color:var(--text-muted);font-style:italic; }
+    .ing-amount-input { width:110px;flex-shrink:0;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:12px 10px;border-radius:10px;outline:none;transition:border-color .2s; }
+    .ing-amount-input:focus { border-color:var(--gold); }
+    .ing-amount-input::placeholder { color:var(--text-muted); }
+    .btn-remove-ing { width:36px;height:44px;flex-shrink:0;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;transition:all .15s;font-size:16px; }
+    .btn-remove-ing:hover { border-color:var(--red);color:var(--red); }
+    .btn-add-ing { border:1px dashed var(--border);background:transparent;color:var(--text-muted);font-family:'DM Sans',sans-serif;font-size:13px;padding:10px;border-radius:10px;cursor:pointer;transition:all .2s;width:100%;margin-top:4px; }
+    .btn-add-ing:hover { border-color:var(--gold);color:var(--gold);background:var(--gold-dim); }
+    .modal-footer { padding:0 28px 28px;display:flex;justify-content:flex-end;gap:10px; }
 
-    /* ── Toast ── */
-    .toast { position: fixed; bottom: 32px; right: 32px; z-index: 999; background: var(--surface2); border: 1px solid var(--border); border-left: 3px solid var(--green); padding: 14px 20px; border-radius: 10px; font-size: 14px; color: var(--text); box-shadow: 0 16px 40px rgba(0,0,0,.5); transform: translateY(20px); opacity: 0; transition: all .3s; pointer-events: none; }
-    .toast.show { transform: translateY(0); opacity: 1; }
-    .toast.del { border-left-color: var(--red); }
-    .toast.err { border-left-color: var(--red); }
+    /* ── Saving / Toast / Confirm ── */
+    .saving-badge { display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:99px;font-size:12px;background:var(--gold-dim);color:var(--gold);border:1px solid rgba(201,168,76,.2);opacity:0;transition:opacity .3s; }
+    .saving-badge.show { opacity:1; }
+    .toast { position:fixed;bottom:32px;right:32px;z-index:999;background:var(--surface2);border:1px solid var(--border);border-left:3px solid var(--green);padding:14px 20px;border-radius:10px;font-size:14px;color:var(--text);box-shadow:0 16px 40px rgba(0,0,0,.5);transform:translateY(20px);opacity:0;transition:all .3s;pointer-events:none; }
+    .toast.show { transform:translateY(0);opacity:1; }
+    .toast.del { border-left-color:var(--red); }
+    .toast.err { border-left-color:var(--red); }
+    .confirm-overlay { position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .2s; }
+    .confirm-overlay.open { opacity:1;pointer-events:all; }
+    .confirm-box { background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;max-width:380px;width:100%;text-align:center;transform:scale(.95);transition:transform .2s; }
+    .confirm-overlay.open .confirm-box { transform:scale(1); }
+    .confirm-icon { font-size:40px;margin-bottom:16px; }
+    .confirm-box h3 { font-family:'Playfair Display',serif;font-size:22px;margin-bottom:8px; }
+    .confirm-box p { font-size:14px;color:var(--text-muted);margin-bottom:24px; }
+    .confirm-actions { display:flex;gap:10px;justify-content:center; }
+    .btn-confirm-del { background:var(--red);color:#fff;border:none; }
+    .btn-confirm-del:hover { background:#e8705e; }
 
-    /* ── Confirm ── */
-    .confirm-overlay { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,.6); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; padding: 24px; opacity: 0; pointer-events: none; transition: opacity .2s; }
-    .confirm-overlay.open { opacity: 1; pointer-events: all; }
-    .confirm-box { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 32px; max-width: 380px; width: 100%; text-align: center; transform: scale(.95); transition: transform .2s; }
-    .confirm-overlay.open .confirm-box { transform: scale(1); }
-    .confirm-icon { font-size: 40px; margin-bottom: 16px; }
-    .confirm-box h3 { font-family: 'Playfair Display', serif; font-size: 22px; margin-bottom: 8px; }
-    .confirm-box p { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; }
-    .confirm-actions { display: flex; gap: 10px; justify-content: center; }
-    .btn-confirm-del { background: var(--red); color: #fff; border: none; }
-    .btn-confirm-del:hover { background: #e8705e; }
-
-    @media (max-width: 640px) {
-      header { padding: 32px 20px 20px; flex-direction: column; align-items: flex-start; }
-      main { padding: 24px 16px; }
-      .field-row { grid-template-columns: 1fr; }
-      .search-input { width: 180px; }
+    @media(max-width:640px){
+      header{padding:32px 20px 20px;flex-direction:column;align-items:flex-start;}
+      main{padding:24px 16px;}
+      .field-row{grid-template-columns:1fr;}
+      .search-input{width:160px;}
     }
   </style>
 </head>
@@ -197,11 +204,15 @@
   </div>
   <div class="header-actions">
     <span class="saving-badge" id="savingBadge">⏳ Đang lưu…</span>
-    <div class="search-wrap">
+    <div class="page-tabs">
+      <button class="page-tab active" onclick="switchPage('recipes')">🍹 Công thức</button>
+      <button class="page-tab" onclick="switchPage('ingredients')">🧪 Nguyên liệu</button>
+    </div>
+    <div class="search-wrap" id="searchWrap">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
       <input class="search-input" id="searchInput" type="text" placeholder="Tìm công thức…" oninput="renderCards()" />
     </div>
-    <button class="btn btn-gold" onclick="openModal()">
+    <button class="btn btn-gold" id="addBtn" onclick="openModal()">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
       Thêm công thức
     </button>
@@ -214,8 +225,7 @@
     <div class="setup-icon">🔗</div>
     <div class="setup-content">
       <h3>Kết nối Google Sheet của bạn</h3>
-      <p>Dán URL của Google Apps Script Web App vào đây. Dữ liệu sẽ được lưu trực tiếp vào Google Sheet private của bạn.<br>
-      <strong style="color:var(--gold)">Xem hướng dẫn bên dưới nếu chưa có URL.</strong></p>
+      <p>Dán URL Google Apps Script Web App vào đây để lưu dữ liệu vào Sheet private của bạn.</p>
       <div class="setup-input-row">
         <input class="setup-input" id="apiUrlInput" type="text" placeholder="https://script.google.com/macros/s/…/exec" />
         <button class="btn btn-gold" onclick="saveApiUrl()">Kết nối</button>
@@ -224,16 +234,31 @@
     </div>
   </div>
 
-  <!-- Stats -->
-  <div class="stats" id="stats"></div>
-  <!-- Filters -->
-  <div class="filter-bar" id="filterBar"></div>
-  <!-- Cards -->
-  <div class="grid" id="cardGrid">
-    <div class="loading-state">
-      <div class="spinner"></div>
-      <p>Đang tải công thức…</p>
+  <!-- Page: Recipes -->
+  <div class="page active" id="page-recipes">
+    <div class="stats" id="stats"></div>
+    <div class="filter-bar" id="filterBar"></div>
+    <div class="grid" id="cardGrid">
+      <div class="loading-state"><div class="spinner"></div><p>Đang tải công thức…</p></div>
     </div>
+  </div>
+
+  <!-- Page: Ingredients -->
+  <div class="page" id="page-ingredients">
+    <div class="ing-page-header">
+      <h2>🧪 Danh sách nguyên liệu</h2>
+      <input class="ing-search" id="ingSearch" type="text" placeholder="Tìm nguyên liệu…" oninput="renderIngredients()" />
+    </div>
+    <div class="ing-add-row">
+      <input id="newIngName" placeholder="Tên nguyên liệu mới…" onkeydown="if(event.key==='Enter')addIngredient()" />
+      <input id="newIngUnit" placeholder="Đơn vị (ml, g, muỗng…)" style="max-width:180px" onkeydown="if(event.key==='Enter')addIngredient()" />
+      <button class="btn btn-green" onclick="addIngredient()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+        Thêm
+      </button>
+    </div>
+    <div class="ing-count" id="ingCount"></div>
+    <div class="ing-grid" id="ingGrid"></div>
   </div>
 </main>
 
@@ -308,101 +333,93 @@
 <div class="toast" id="toast"></div>
 
 <script>
-  // ── Config ──────────────────────────────────────────────────────
+  // ── State ──────────────────────────────────────────────────────
   const API_KEY = 'sip_craft_api_url';
   let API_URL = localStorage.getItem(API_KEY) || '';
   let recipes = [];
+  let ingredientList = []; // [{name, unit}]
   let editingId = null;
   let activeFilter = 'all';
   let deletingId = null;
+  let currentPage = 'recipes';
 
-  // ── Init ────────────────────────────────────────────────────────
+  // ── Init ───────────────────────────────────────────────────────
   window.addEventListener('DOMContentLoaded', () => {
     if (API_URL) {
       document.getElementById('apiUrlInput').value = API_URL;
       document.getElementById('setupBanner').classList.add('hidden');
-      loadRecipes();
+      loadAll();
     } else {
-      document.getElementById('cardGrid').innerHTML = `
-        <div class="empty-state">
-          <div class="empty-icon">🔗</div>
-          <h3>Chưa kết nối Google Sheet</h3>
-          <p style="font-size:14px;margin-top:4px">Điền URL Apps Script vào ô phía trên để bắt đầu.</p>
-        </div>`;
+      document.getElementById('cardGrid').innerHTML = `<div class="empty-state"><div class="empty-icon">🔗</div><h3>Chưa kết nối Google Sheet</h3><p style="font-size:14px;margin-top:4px">Điền URL Apps Script vào ô phía trên để bắt đầu.</p></div>`;
       renderStats();
     }
   });
 
   function saveApiUrl() {
     const url = document.getElementById('apiUrlInput').value.trim();
-    if (!url.startsWith('https://script.google.com')) {
-      showToast('❌ URL không hợp lệ!', 'err'); return;
-    }
+    if (!url.startsWith('https://script.google.com')) { showToast('❌ URL không hợp lệ!','err'); return; }
     API_URL = url;
     localStorage.setItem(API_KEY, url);
     document.getElementById('setupBanner').classList.add('hidden');
-    loadRecipes();
+    loadAll();
   }
 
-  // ── API Calls ───────────────────────────────────────────────────
-  async function loadRecipes() {
+  // ── Page switch ────────────────────────────────────────────────
+  function switchPage(page) {
+    currentPage = page;
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.page-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('page-' + page).classList.add('active');
+    document.querySelectorAll('.page-tab')[page === 'recipes' ? 0 : 1].classList.add('active');
+    document.getElementById('searchWrap').style.display = page === 'recipes' ? '' : 'none';
+    document.getElementById('addBtn').style.display = page === 'recipes' ? '' : 'none';
+    if (page === 'ingredients') renderIngredients();
+  }
+
+  // ── API ────────────────────────────────────────────────────────
+  async function loadAll() {
     document.getElementById('cardGrid').innerHTML = `<div class="loading-state"><div class="spinner"></div><p>Đang tải từ Google Sheet…</p></div>`;
     try {
-      const res = await fetch(API_URL);
+      const res  = await fetch(API_URL);
       const data = await res.json();
       if (data.error) throw new Error(data.error);
-      recipes = data.recipes || [];
+      recipes        = data.recipes || [];
+      ingredientList = data.ingredientList || [];
       renderCards();
     } catch (err) {
-      document.getElementById('cardGrid').innerHTML = `
-        <div class="empty-state">
-          <div class="empty-icon">⚠️</div>
-          <h3>Không thể kết nối</h3>
-          <p style="font-size:13px;color:var(--red);margin-top:4px">${err.message}</p>
-          <p style="font-size:12px;margin-top:8px">Kiểm tra lại URL hoặc quyền truy cập Apps Script.</p>
-        </div>`;
+      document.getElementById('cardGrid').innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><h3>Không thể kết nối</h3><p style="font-size:13px;color:var(--red);margin-top:4px">${err.message}</p></div>`;
     }
   }
 
   async function apiPost(body) {
     setSaving(true);
     try {
-      const res = await fetch(API_URL, {
-        method: 'POST',
-        body: JSON.stringify(body),
-      });
+      const res  = await fetch(API_URL, { method:'POST', body: JSON.stringify(body) });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       return data;
-    } finally {
-      setSaving(false);
-    }
+    } finally { setSaving(false); }
   }
 
-  function setSaving(on) {
-    document.getElementById('savingBadge').classList.toggle('show', on);
-  }
+  function setSaving(on) { document.getElementById('savingBadge').classList.toggle('show', on); }
 
-  // ── Render ──────────────────────────────────────────────────────
-  function getCategories() {
-    return [...new Set(recipes.map(r => r.category).filter(Boolean))];
-  }
+  // ── Render Recipes ─────────────────────────────────────────────
+  function getCategories() { return [...new Set(recipes.map(r => r.category).filter(Boolean))]; }
 
   function renderStats() {
-    const cats = getCategories();
     document.getElementById('stats').innerHTML = `
       <div class="stat"><div class="stat-num">${recipes.length}</div><div class="stat-label">Công thức</div></div>
-      <div class="stat"><div class="stat-num">${cats.length}</div><div class="stat-label">Danh mục</div></div>
-    `;
+      <div class="stat"><div class="stat-num">${getCategories().length}</div><div class="stat-label">Danh mục</div></div>
+      <div class="stat"><div class="stat-num">${ingredientList.length}</div><div class="stat-label">Nguyên liệu</div></div>`;
   }
 
   function renderFilters() {
     const cats = getCategories();
     document.getElementById('filterBar').innerHTML =
-      `<button class="filter-tab ${activeFilter === 'all' ? 'active' : ''}" onclick="setFilter('all')">Tất cả (${recipes.length})</button>` +
+      `<button class="filter-tab ${activeFilter==='all'?'active':''}" onclick="setFilter('all')">Tất cả (${recipes.length})</button>` +
       cats.map(c => {
-        const count = recipes.filter(r => r.category === c).length;
-        return `<button class="filter-tab ${activeFilter === c ? 'active' : ''}" onclick="setFilter(\`${c}\`)">${c} (${count})</button>`;
+        const n = recipes.filter(r=>r.category===c).length;
+        return `<button class="filter-tab ${activeFilter===c?'active':''}" onclick="setFilter(\`${c}\`)">${c} (${n})</button>`;
       }).join('');
   }
 
@@ -411,41 +428,35 @@
   function renderCards() {
     const q = document.getElementById('searchInput').value.toLowerCase();
     const list = recipes.filter(r => {
-      const matchCat = activeFilter === 'all' || r.category === activeFilter;
-      const matchQ = !q || r.name.toLowerCase().includes(q) || (r.desc||'').toLowerCase().includes(q) || (r.category||'').toLowerCase().includes(q);
-      return matchCat && matchQ;
+      const mc = activeFilter==='all' || r.category===activeFilter;
+      const mq = !q || r.name.toLowerCase().includes(q)||(r.desc||'').toLowerCase().includes(q)||(r.category||'').toLowerCase().includes(q);
+      return mc && mq;
     });
-
     renderStats(); renderFilters();
-
     const grid = document.getElementById('cardGrid');
     if (!list.length) {
       grid.innerHTML = `<div class="empty-state"><div class="empty-icon">🍹</div><h3>Chưa có công thức nào</h3><p style="color:var(--text-muted);font-size:14px;margin-top:4px">Nhấn <strong>Thêm công thức</strong> để bắt đầu.</p></div>`;
       return;
     }
-
-    grid.innerHTML = list.map((r, i) => `
+    grid.innerHTML = list.map((r,i) => `
       <div class="card" style="animation-delay:${i*60}ms">
-        <div class="card-header">
-          <div class="card-icon">${r.emoji||'🥤'}</div>
-          <span class="card-badge">${r.category||'Chưa phân loại'}</span>
-        </div>
+        <div class="card-header"><div class="card-icon">${r.emoji||'🥤'}</div><span class="card-badge">${r.category||'Chưa phân loại'}</span></div>
         <div class="card-title">${r.name}</div>
-        ${r.desc ? `<div class="card-desc">${r.desc}</div>` : ''}
+        ${r.desc?`<div class="card-desc">${r.desc}</div>`:''}
         <div style="display:flex;gap:12px;padding:10px 24px 0;flex-wrap:wrap;">
-          ${r.difficulty ? `<span style="font-size:12px;color:var(--text-muted)">🎯 ${r.difficulty}</span>` : ''}
-          ${r.time ? `<span style="font-size:12px;color:var(--text-muted)">⏱ ${r.time} phút</span>` : ''}
-          ${r.serving ? `<span style="font-size:12px;color:var(--text-muted)">🍶 ${r.serving}</span>` : ''}
+          ${r.difficulty?`<span style="font-size:12px;color:var(--text-muted)">🎯 ${r.difficulty}</span>`:''}
+          ${r.time?`<span style="font-size:12px;color:var(--text-muted)">⏱ ${r.time} phút</span>`:''}
+          ${r.serving?`<span style="font-size:12px;color:var(--text-muted)">🍶 ${r.serving}</span>`:''}
         </div>
         <div class="card-divider"></div>
-        ${r.ingredients && r.ingredients.length ? `
+        ${r.ingredients&&r.ingredients.length?`
           <div class="card-section-label">Nguyên liệu</div>
           <ul class="ingredients-list">
-            ${r.ingredients.slice(0,4).map(ing => `<li><span style="color:var(--text-muted)">${ing.amount}</span>&nbsp;${ing.name}</li>`).join('')}
-            ${r.ingredients.length > 4 ? `<li style="color:var(--text-muted);font-style:italic">+${r.ingredients.length-4} nguyên liệu khác…</li>` : ''}
-          </ul>` : ''}
-        ${r.steps ? `<div class="card-divider"></div><div class="card-section-label">Cách pha chế</div><div class="card-steps">${r.steps.length>180?r.steps.slice(0,180)+'…':r.steps}</div>` : ''}
-        ${r.notes ? `<div style="margin:12px 24px 0;padding:10px 14px;background:var(--gold-dim);border-radius:8px;font-size:12px;color:var(--gold);">💡 ${r.notes}</div>` : ''}
+            ${r.ingredients.slice(0,4).map(ing=>`<li><span style="color:var(--text-muted)">${ing.amount}</span>&nbsp;${ing.name}</li>`).join('')}
+            ${r.ingredients.length>4?`<li style="color:var(--text-muted);font-style:italic">+${r.ingredients.length-4} nguyên liệu khác…</li>`:''}
+          </ul>`:''}
+        ${r.steps?`<div class="card-divider"></div><div class="card-section-label">Cách pha chế</div><div class="card-steps">${r.steps.length>180?r.steps.slice(0,180)+'…':r.steps}</div>`:''}
+        ${r.notes?`<div style="margin:12px 24px 0;padding:10px 14px;background:var(--gold-dim);border-radius:8px;font-size:12px;color:var(--gold);">💡 ${r.notes}</div>`:''}
         <div class="card-footer">
           <button class="btn btn-ghost" style="font-size:13px;padding:7px 16px" onclick="openModal('${r.id}')">✏️ Sửa</button>
           <button class="btn btn-danger" onclick="confirmDelete('${r.id}')">🗑️ Xóa</button>
@@ -453,28 +464,143 @@
       </div>`).join('');
   }
 
-  // ── Modal ───────────────────────────────────────────────────────
-  function openModal(id = null) {
-    editingId = id;
-    resetForm();
+  // ── Render Ingredients page ────────────────────────────────────
+  function renderIngredients() {
+    const q = (document.getElementById('ingSearch').value||'').toLowerCase();
+    const list = ingredientList.filter(i => !q || i.name.toLowerCase().includes(q));
+    document.getElementById('ingCount').textContent = `${list.length} nguyên liệu${q?' (đang lọc)':''}`;
+    const grid = document.getElementById('ingGrid');
+    if (!list.length) {
+      grid.innerHTML = `<div style="color:var(--text-muted);font-size:14px;padding:24px 0;">Chưa có nguyên liệu nào.</div>`;
+      return;
+    }
+    grid.innerHTML = list.map(ing => `
+      <div class="ing-card">
+        <div class="ing-card-info">
+          <div class="ing-card-name">${ing.name}</div>
+          ${ing.unit?`<div class="ing-card-unit">📏 ${ing.unit}</div>`:''}
+        </div>
+        <button class="ing-delete" onclick="deleteIngredient('${ing.name.replace(/'/g,"\\'")}')">🗑</button>
+      </div>`).join('');
+  }
+
+  async function addIngredient() {
+    if (!API_URL) { showToast('❌ Chưa kết nối!','err'); return; }
+    const name = document.getElementById('newIngName').value.trim();
+    const unit = document.getElementById('newIngUnit').value.trim();
+    if (!name) { document.getElementById('newIngName').focus(); return; }
+    try {
+      await apiPost({ action:'addIngredient', name, unit });
+      ingredientList.push({ name, unit });
+      ingredientList.sort((a,b) => a.name.localeCompare(b.name,'vi'));
+      document.getElementById('newIngName').value = '';
+      document.getElementById('newIngUnit').value = '';
+      renderIngredients();
+      renderStats();
+      showToast('✅ Đã thêm nguyên liệu!');
+    } catch(err) { showToast('❌ '+err.message,'err'); }
+  }
+
+  async function deleteIngredient(name) {
+    if (!confirm(`Xóa nguyên liệu "${name}"?`)) return;
+    try {
+      await apiPost({ action:'deleteIngredient', name });
+      ingredientList = ingredientList.filter(i => i.name !== name);
+      renderIngredients();
+      renderStats();
+      showToast('🗑️ Đã xóa.','del');
+    } catch(err) { showToast('❌ '+err.message,'err'); }
+  }
+
+  // ── Ingredient autocomplete ────────────────────────────────────
+  function addIngredientRow(name='', amount='') {
+    const rowId = 'ing_' + Date.now() + Math.random().toString(36).slice(2);
+    const row = document.createElement('div');
+    row.className = 'ingredient-row';
+    row.dataset.rowId = rowId;
+    row.innerHTML = `
+      <div class="ing-autocomplete-wrap">
+        <input class="ing-name-input" placeholder="Tên nguyên liệu" value="${name}" autocomplete="off"
+          oninput="showDropdown(this,'${rowId}')"
+          onkeydown="handleDropdownKey(event,'${rowId}')"
+          onfocus="showDropdown(this,'${rowId}')"
+        />
+        <div class="ing-dropdown" id="drop_${rowId}"></div>
+      </div>
+      <input class="ing-amount-input" placeholder="Số lượng" value="${amount}" id="amt_${rowId}" />
+      <button class="btn-remove-ing" onclick="this.closest('.ingredient-row').remove()">−</button>`;
+    document.getElementById('ingredientRows').appendChild(row);
+    if (!name) row.querySelector('.ing-name-input').focus();
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function handler(e) {
+      if (!row.contains(e.target)) {
+        const dd = document.getElementById('drop_' + rowId);
+        if (dd) dd.classList.remove('show');
+      }
+    });
+  }
+
+  function showDropdown(input, rowId) {
+    const q = input.value.toLowerCase();
+    const dd = document.getElementById('drop_' + rowId);
+    const matches = ingredientList.filter(i => !q || i.name.toLowerCase().includes(q)).slice(0, 12);
+    if (!matches.length) { dd.classList.remove('show'); return; }
+    dd.innerHTML = matches.map((i,idx) =>
+      `<div class="ing-dropdown-item" data-name="${i.name}" data-unit="${i.unit}" data-idx="${idx}"
+        onmousedown="selectIngredient('${rowId}','${i.name.replace(/'/g,"\\'")}','${i.unit}')">
+        ${i.name}<span>${i.unit}</span>
+      </div>`).join('');
+    dd.classList.add('show');
+  }
+
+  function selectIngredient(rowId, name, unit) {
+    const row = document.querySelector(`[data-row-id="${rowId}"]`);
+    row.querySelector('.ing-name-input').value = name;
+    const amtInput = document.getElementById('amt_' + rowId);
+    if (!amtInput.value && unit) amtInput.value = unit;
+    document.getElementById('drop_' + rowId).classList.remove('show');
+    amtInput.focus();
+  }
+
+  function handleDropdownKey(e, rowId) {
+    const dd = document.getElementById('drop_' + rowId);
+    const items = dd.querySelectorAll('.ing-dropdown-item');
+    let focused = dd.querySelector('.focused');
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (!focused) { items[0]?.classList.add('focused'); }
+      else { focused.classList.remove('focused'); (focused.nextElementSibling||items[0]).classList.add('focused'); }
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (!focused) { items[items.length-1]?.classList.add('focused'); }
+      else { focused.classList.remove('focused'); (focused.previousElementSibling||items[items.length-1]).classList.add('focused'); }
+    } else if (e.key === 'Enter' && focused) {
+      e.preventDefault();
+      selectIngredient(rowId, focused.dataset.name, focused.dataset.unit);
+    } else if (e.key === 'Escape') {
+      dd.classList.remove('show');
+    }
+  }
+
+  // ── Modal ──────────────────────────────────────────────────────
+  function openModal(id=null) {
+    editingId = id; resetForm();
     document.getElementById('modalTitle').textContent = id ? 'Chỉnh sửa công thức' : 'Công thức mới';
     if (id) {
-      const r = recipes.find(x => x.id === id);
-      if (!r) return;
-      document.getElementById('fName').value = r.name||'';
-      document.getElementById('fEmoji').value = r.emoji||'';
-      document.getElementById('fCategory').value = r.category||'';
+      const r = recipes.find(x => x.id === id); if (!r) return;
+      document.getElementById('fName').value    = r.name||'';
+      document.getElementById('fEmoji').value   = r.emoji||'';
+      document.getElementById('fCategory').value= r.category||'';
       document.getElementById('fDifficulty').value = r.difficulty||'Dễ';
-      document.getElementById('fTime').value = r.time||'';
+      document.getElementById('fTime').value    = r.time||'';
       document.getElementById('fServing').value = r.serving||'';
-      document.getElementById('fDesc').value = r.desc||'';
-      document.getElementById('fSteps').value = r.steps||'';
-      document.getElementById('fNotes').value = r.notes||'';
+      document.getElementById('fDesc').value    = r.desc||'';
+      document.getElementById('fSteps').value   = r.steps||'';
+      document.getElementById('fNotes').value   = r.notes||'';
       (r.ingredients||[]).forEach(ing => addIngredientRow(ing.name, ing.amount));
       if (!(r.ingredients||[]).length) addIngredientRow();
-    } else {
-      addIngredientRow();
-    }
+    } else { addIngredientRow(); }
     document.getElementById('modalOverlay').classList.add('open');
     document.getElementById('fName').focus();
   }
@@ -484,35 +610,26 @@
   function resetForm() {
     ['fName','fEmoji','fCategory','fDifficulty','fTime','fServing','fDesc','fSteps','fNotes'].forEach(id => {
       const el = document.getElementById(id);
-      if (el.tagName === 'SELECT') el.selectedIndex = 0; else el.value = '';
+      if (el.tagName==='SELECT') el.selectedIndex=0; else el.value='';
     });
     document.getElementById('ingredientRows').innerHTML = '';
   }
 
-  function addIngredientRow(name='', amount='') {
-    const row = document.createElement('div');
-    row.className = 'ingredient-row';
-    row.innerHTML = `<input class="ing-name" placeholder="Tên nguyên liệu" value="${name}" style="flex:1"/>
-      <input class="ing-amount ing-unit" placeholder="Số lượng" value="${amount}"/>
-      <button class="btn-remove-ing" onclick="this.parentElement.remove()" title="Xóa">−</button>`;
-    document.getElementById('ingredientRows').appendChild(row);
-  }
-
   async function saveRecipe() {
-    if (!API_URL) { showToast('❌ Chưa kết nối Google Sheet!', 'err'); return; }
-    const name = document.getElementById('fName').value.trim();
+    if (!API_URL) { showToast('❌ Chưa kết nối Google Sheet!','err'); return; }
+    const name     = document.getElementById('fName').value.trim();
     const category = document.getElementById('fCategory').value;
-    if (!name) { alert('Vui lòng nhập tên đồ uống!'); return; }
+    if (!name)     { alert('Vui lòng nhập tên đồ uống!'); return; }
     if (!category) { alert('Vui lòng chọn danh mục!'); return; }
 
-    const ingRows = document.querySelectorAll('#ingredientRows .ingredient-row');
+    const ingRows    = document.querySelectorAll('#ingredientRows .ingredient-row');
     const ingredients = [...ingRows].map(row => ({
-      name: row.querySelector('.ing-name').value.trim(),
-      amount: row.querySelector('.ing-amount').value.trim()
+      name:   row.querySelector('.ing-name-input').value.trim(),
+      amount: row.querySelector('.ing-amount-input').value.trim()
     })).filter(i => i.name);
 
     const recipe = {
-      ...(editingId ? { id: editingId } : {}),
+      ...(editingId ? {id:editingId} : {}),
       name, emoji: document.getElementById('fEmoji').value||'🥤',
       category, difficulty: document.getElementById('fDifficulty').value,
       time: document.getElementById('fTime').value,
@@ -524,57 +641,52 @@
 
     const btn = document.getElementById('saveBtn');
     btn.disabled = true; btn.textContent = '⏳ Đang lưu…';
-
     try {
       if (editingId) {
-        await apiPost({ action: 'update', recipe });
+        await apiPost({ action:'update', recipe });
         const idx = recipes.findIndex(r => r.id === editingId);
         if (idx !== -1) recipes[idx] = { ...recipes[idx], ...recipe };
         showToast('✅ Đã cập nhật công thức!');
       } else {
-        const res = await apiPost({ action: 'add', recipe });
+        const res = await apiPost({ action:'add', recipe });
         recipe.id = res.id;
         recipes.unshift(recipe);
         showToast('🍹 Đã thêm công thức mới!');
       }
       closeModal(); renderCards();
-    } catch (err) {
-      showToast('❌ Lỗi: ' + err.message, 'err');
-    } finally {
+    } catch(err) { showToast('❌ Lỗi: '+err.message,'err'); }
+    finally {
       btn.disabled = false;
       btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M5 13l4 4L19 7"/></svg> Lưu công thức`;
     }
   }
 
-  // ── Delete ──────────────────────────────────────────────────────
-  function confirmDelete(id) { deletingId = id; document.getElementById('confirmOverlay').classList.add('open'); }
-  function closeConfirm() { deletingId = null; document.getElementById('confirmOverlay').classList.remove('open'); }
+  // ── Delete recipe ──────────────────────────────────────────────
+  function confirmDelete(id) { deletingId=id; document.getElementById('confirmOverlay').classList.add('open'); }
+  function closeConfirm() { deletingId=null; document.getElementById('confirmOverlay').classList.remove('open'); }
 
-  document.getElementById('confirmDeleteBtn').onclick = async function () {
+  document.getElementById('confirmDeleteBtn').onclick = async function() {
     if (!deletingId) return;
-    this.disabled = true; this.textContent = '⏳ Đang xóa…';
+    this.disabled=true; this.textContent='⏳ Đang xóa…';
     try {
-      await apiPost({ action: 'delete', id: deletingId });
+      await apiPost({ action:'delete', id:deletingId });
       recipes = recipes.filter(r => r.id !== deletingId);
       closeConfirm(); renderCards();
-      showToast('🗑️ Đã xóa công thức.', 'del');
-    } catch (err) {
-      showToast('❌ Lỗi: ' + err.message, 'err');
-    } finally {
-      this.disabled = false; this.textContent = 'Xóa ngay';
-    }
+      showToast('🗑️ Đã xóa công thức.','del');
+    } catch(err) { showToast('❌ Lỗi: '+err.message,'err'); }
+    finally { this.disabled=false; this.textContent='Xóa ngay'; }
   };
 
-  // ── Utils ───────────────────────────────────────────────────────
+  // ── Utils ──────────────────────────────────────────────────────
   function showToast(msg, type='') {
     const t = document.getElementById('toast');
-    t.textContent = msg; t.className = 'toast show ' + type;
-    setTimeout(() => { t.className = 'toast ' + type; }, 3500);
+    t.textContent=msg; t.className='toast show '+type;
+    setTimeout(() => { t.className='toast '+type; }, 3500);
   }
 
-  document.getElementById('modalOverlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
-  document.getElementById('confirmOverlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeConfirm(); });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeConfirm(); } });
+  document.getElementById('modalOverlay').addEventListener('click', e => { if(e.target===e.currentTarget) closeModal(); });
+  document.getElementById('confirmOverlay').addEventListener('click', e => { if(e.target===e.currentTarget) closeConfirm(); });
+  document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); closeConfirm(); } });
 </script>
 </body>
 </html>
