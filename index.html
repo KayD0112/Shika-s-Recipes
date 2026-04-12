@@ -147,8 +147,8 @@
 
     /* ── Ingredient combobox rows ── */
     .ingredient-rows { display:flex;flex-direction:column;gap:8px; }
-    .ingredient-row { display:flex;gap:8px;align-items:flex-start; }
-    .ing-combo-wrap { flex:1;position:relative; }
+    .ingredient-row { display:flex;gap:8px;align-items:flex-start;width:100%; }
+    .ing-combo-wrap { flex:1 1 0;min-width:0;position:relative; }
     .ing-name-input { width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:12px 36px 12px 14px;border-radius:10px;outline:none;transition:border-color .2s,box-shadow .2s; }
     .ing-name-input:focus { border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.1); }
     .ing-name-input::placeholder { color:var(--text-muted); }
