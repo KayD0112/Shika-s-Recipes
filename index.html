@@ -512,76 +512,82 @@
     } catch(err) { showToast('❌ '+err.message,'err'); }
   }
 
-  // ── Ingredient autocomplete ────────────────────────────────────
-  function addIngredientRow(name='', amount='') {
-    const rowId = 'ing_' + Date.now() + Math.random().toString(36).slice(2);
-    const row = document.createElement('div');
+  // ── Ingredient combobox ────────────────────────────────────────
+  function addIngredientRow(name, amount) {
+    name = name || ''; amount = amount || '';
+    var row = document.createElement('div');
     row.className = 'ingredient-row';
-    row.dataset.rowId = rowId;
-    row.innerHTML = `
-      <div class="ing-autocomplete-wrap">
-        <input class="ing-name-input" placeholder="Tên nguyên liệu" value="${name}" autocomplete="off"
-          oninput="showDropdown(this,'${rowId}')"
-          onkeydown="handleDropdownKey(event,'${rowId}')"
-          onfocus="showDropdown(this,'${rowId}')"
-        />
-        <div class="ing-dropdown" id="drop_${rowId}"></div>
-      </div>
-      <input class="ing-amount-input" placeholder="Số lượng" value="${amount}" id="amt_${rowId}" />
-      <button class="btn-remove-ing" onclick="this.closest('.ingredient-row').remove()">−</button>`;
+    row.innerHTML =
+      '<div class="ing-combo-wrap">' +
+        '<input class="ing-name-input" placeholder="Gõ để tìm hoặc nhập tên…" autocomplete="off" />' +
+        '<span class="ing-combo-arrow">&#9662;</span>' +
+        '<div class="ing-dropdown"></div>' +
+      '</div>' +
+      '<input class="ing-amount-input" placeholder="Số lượng" />' +
+      '<button class="btn-remove-ing" onclick="this.closest('[data-ing]').remove()">&#8722;</button>';
+    row.setAttribute('data-ing','1');
     document.getElementById('ingredientRows').appendChild(row);
-    if (!name) row.querySelector('.ing-name-input').focus();
 
-    // Close dropdown when clicking outside
-    document.addEventListener('click', function handler(e) {
-      if (!row.contains(e.target)) {
-        const dd = document.getElementById('drop_' + rowId);
-        if (dd) dd.classList.remove('show');
+    var input  = row.querySelector('.ing-name-input');
+    var dd     = row.querySelector('.ing-dropdown');
+    var amtInp = row.querySelector('.ing-amount-input');
+    input.value  = name;
+    amtInp.value = amount;
+
+    function pick(item) {
+      input.value = item.dataset.name;
+      if (!amtInp.value && item.dataset.unit) amtInp.value = item.dataset.unit;
+      dd.classList.remove('show');
+      amtInp.focus();
+    }
+
+    function renderDrop(q) {
+      var list = ingredientList.filter(function(i) {
+        return !q || i.name.toLowerCase().indexOf(q.toLowerCase()) !== -1;
+      });
+      if (!list.length) {
+        dd.innerHTML = '<div class="ing-dropdown-empty">' +
+          (ingredientList.length === 0 ? '⚠️ Chưa có nguyên liệu — vào tab Nguyên liệu để thêm' : 'Không tìm thấy "' + q + '"') +
+          '</div>';
+      } else {
+        dd.innerHTML = list.map(function(i) {
+          return '<div class="ing-dropdown-item" data-name="' + i.name + '" data-unit="' + (i.unit||'') + '">' +
+            '<span class="ing-item-name">' + i.name + '</span>' +
+            '<span class="ing-item-unit">' + (i.unit||'') + '</span>' +
+            '</div>';
+        }).join('');
+        dd.querySelectorAll('.ing-dropdown-item').forEach(function(item) {
+          item.addEventListener('mousedown', function(e) { e.preventDefault(); pick(item); });
+        });
       }
+      dd.classList.add('show');
+    }
+
+    input.addEventListener('focus', function() { renderDrop(input.value); });
+    input.addEventListener('input', function() { renderDrop(input.value); });
+    input.addEventListener('keydown', function(e) {
+      var items = Array.from(dd.querySelectorAll('.ing-dropdown-item'));
+      var fi = items.findIndex(function(i) { return i.classList.contains('focused'); });
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (fi >= 0) items[fi].classList.remove('focused');
+        var nx = items[(fi+1) % items.length];
+        if (nx) { nx.classList.add('focused'); nx.scrollIntoView({block:'nearest'}); }
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (fi >= 0) items[fi].classList.remove('focused');
+        var pv = items[(fi-1+items.length) % items.length];
+        if (pv) { pv.classList.add('focused'); pv.scrollIntoView({block:'nearest'}); }
+      } else if (e.key === 'Enter') {
+        var foc = dd.querySelector('.focused');
+        if (foc) { e.preventDefault(); pick(foc); }
+      } else if (e.key === 'Escape') { dd.classList.remove('show'); }
+    });
+    document.addEventListener('click', function(e) {
+      if (!row.contains(e.target)) dd.classList.remove('show');
     });
   }
 
-  function showDropdown(input, rowId) {
-    const q = input.value.toLowerCase();
-    const dd = document.getElementById('drop_' + rowId);
-    const matches = ingredientList.filter(i => !q || i.name.toLowerCase().includes(q)).slice(0, 12);
-    if (!matches.length) { dd.classList.remove('show'); return; }
-    dd.innerHTML = matches.map((i,idx) =>
-      `<div class="ing-dropdown-item" data-name="${i.name}" data-unit="${i.unit}" data-idx="${idx}"
-        onmousedown="selectIngredient('${rowId}','${i.name.replace(/'/g,"\\'")}','${i.unit}')">
-        ${i.name}<span>${i.unit}</span>
-      </div>`).join('');
-    dd.classList.add('show');
-  }
-
-  function selectIngredient(rowId, name, unit) {
-    const row = document.querySelector(`[data-row-id="${rowId}"]`);
-    row.querySelector('.ing-name-input').value = name;
-    const amtInput = document.getElementById('amt_' + rowId);
-    if (!amtInput.value && unit) amtInput.value = unit;
-    document.getElementById('drop_' + rowId).classList.remove('show');
-    amtInput.focus();
-  }
-
-  function handleDropdownKey(e, rowId) {
-    const dd = document.getElementById('drop_' + rowId);
-    const items = dd.querySelectorAll('.ing-dropdown-item');
-    let focused = dd.querySelector('.focused');
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      if (!focused) { items[0]?.classList.add('focused'); }
-      else { focused.classList.remove('focused'); (focused.nextElementSibling||items[0]).classList.add('focused'); }
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      if (!focused) { items[items.length-1]?.classList.add('focused'); }
-      else { focused.classList.remove('focused'); (focused.previousElementSibling||items[items.length-1]).classList.add('focused'); }
-    } else if (e.key === 'Enter' && focused) {
-      e.preventDefault();
-      selectIngredient(rowId, focused.dataset.name, focused.dataset.unit);
-    } else if (e.key === 'Escape') {
-      dd.classList.remove('show');
-    }
-  }
 
   // ── Modal ──────────────────────────────────────────────────────
   function openModal(id=null) {
@@ -622,7 +628,7 @@
     if (!name)     { alert('Vui lòng nhập tên đồ uống!'); return; }
     if (!category) { alert('Vui lòng chọn danh mục!'); return; }
 
-    const ingRows    = document.querySelectorAll('#ingredientRows .ingredient-row');
+    const ingRows    = document.querySelectorAll('#ingredientRows [data-ing]');
     const ingredients = [...ingRows].map(row => ({
       name:   row.querySelector('.ing-name-input').value.trim(),
       amount: row.querySelector('.ing-amount-input').value.trim()
