@@ -78,6 +78,13 @@
     .filter-tab { padding:7px 18px;border-radius:99px;font-size:13px;font-weight:500;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;transition:all .2s; }
     .filter-tab:hover { border-color:var(--gold);color:var(--gold); }
     .filter-tab.active { background:var(--gold-dim);border-color:var(--gold);color:var(--gold); }
+    .ing-filter-bar { display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:32px;padding:16px 20px;background:var(--surface);border:1px solid var(--border);border-radius:12px; }
+    .ing-filter-bar:empty { display:none; }
+    .ing-filter-label { font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);font-weight:500;flex-shrink:0; }
+    .ing-filter-pill { padding:5px 14px;border-radius:99px;font-size:12px;font-weight:500;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:5px; }
+    .ing-filter-pill:hover { border-color:var(--green);color:var(--green); }
+    .ing-filter-pill.active { background:var(--green-dim);border-color:var(--green);color:var(--green); }
+    .ing-filter-pill span { background:rgba(255,255,255,.1);border-radius:99px;padding:1px 6px;font-size:11px; }
     .stats { display:flex;gap:32px;margin-bottom:40px;flex-wrap:wrap; }
     .stat { display:flex;flex-direction:column;gap:2px; }
     .stat-num { font-family:'Playfair Display',serif;font-size:32px;color:var(--gold-light);line-height:1; }
@@ -238,6 +245,7 @@
   <div class="page active" id="page-recipes">
     <div class="stats" id="stats"></div>
     <div class="filter-bar" id="filterBar"></div>
+    <div class="ing-filter-bar" id="ingFilterBar"></div>
     <div class="grid" id="cardGrid">
       <div class="loading-state"><div class="spinner"></div><p>Đang tải công thức…</p></div>
     </div>
@@ -340,6 +348,7 @@
   let ingredientList = []; // [{name, unit}]
   let editingId = null;
   let activeFilter = 'all';
+  let activeIngFilter = null; // lọc theo nguyên liệu
   let deletingId = null;
   let currentPage = 'recipes';
 
@@ -392,6 +401,7 @@
       if (data.error) throw new Error(data.error);
       recipes        = data.recipes || [];
       ingredientList = data.ingredientList || [];
+      console.log('[Shika] Loaded:', recipes.length, 'recipes,', ingredientList.length, 'ingredients');
       renderCards();
     } catch (err) {
       const msg = err.name === 'AbortError'
@@ -442,21 +452,47 @@
   function renderFilters() {
     const cats = getCategories();
     document.getElementById('filterBar').innerHTML =
-      `<button class="filter-tab ${activeFilter==='all'?'active':''}" onclick="setFilter('all')">Tất cả (${recipes.length})</button>` +
-      cats.map(c => {
-        const n = recipes.filter(r=>r.category===c).length;
-        return `<button class="filter-tab ${activeFilter===c?'active':''}" onclick="setFilter(\`${c}\`)">${c} (${n})</button>`;
+      '<button class="filter-tab ' + (activeFilter==='all'?'active':'') + '" onclick="setFilter('all')">Tất cả (' + recipes.length + ')</button>' +
+      cats.map(function(c) {
+        var n = recipes.filter(function(r){return r.category===c;}).length;
+        return '<button class="filter-tab ' + (activeFilter===c?'active':'') + '" onclick="setFilter(`' + c + '`)">' + c + ' (' + n + ')</button>';
+      }).join('');
+
+    // Ingredient filter pills
+    var ingBar = document.getElementById('ingFilterBar');
+    if (!ingBar) return;
+    // Count how many recipes use each ingredient
+    var ingCounts = {};
+    recipes.forEach(function(r) {
+      (r.ingredients||[]).forEach(function(i) {
+        if (i.name) ingCounts[i.name] = (ingCounts[i.name]||0) + 1;
+      });
+    });
+    var topIngs = Object.entries(ingCounts).sort(function(a,b){return b[1]-a[1];}).slice(0,20);
+    if (!topIngs.length) { ingBar.innerHTML = ''; return; }
+    ingBar.innerHTML =
+      '<span class="ing-filter-label">🧪 Lọc theo nguyên liệu:</span>' +
+      '<button class="ing-filter-pill ' + (!activeIngFilter?'active':'') + '" onclick="setIngFilter(null)">Tất cả</button>' +
+      topIngs.map(function(entry) {
+        var name = entry[0], count = entry[1];
+        return '<button class="ing-filter-pill ' + (activeIngFilter===name?'active':'') + '" onclick="setIngFilter('' + name.replace(/'/g,"\'") + '')">' + name + ' <span>' + count + '</span></button>';
       }).join('');
   }
 
-  function setFilter(f) { activeFilter = f; renderCards(); }
+  function setIngFilter(name) {
+    activeIngFilter = name;
+    renderCards();
+  }
+
+  function setFilter(f) { activeFilter = f; activeIngFilter = null; renderCards(); }
 
   function renderCards() {
     const q = document.getElementById('searchInput').value.toLowerCase();
     const list = recipes.filter(r => {
       const mc = activeFilter==='all' || r.category===activeFilter;
       const mq = !q || r.name.toLowerCase().includes(q)||(r.desc||'').toLowerCase().includes(q)||(r.category||'').toLowerCase().includes(q);
-      return mc && mq;
+      const mi = !activeIngFilter || (r.ingredients||[]).some(i => i.name === activeIngFilter);
+      return mc && mq && mi;
     });
     renderStats(); renderFilters();
     const grid = document.getElementById('cardGrid');
@@ -568,6 +604,7 @@
     }
 
     function renderDrop(q) {
+      console.log('[Shika] renderDrop called, ingredientList.length=', ingredientList.length);
       var list = ingredientList.filter(function(i) {
         return !q || i.name.toLowerCase().indexOf(q.toLowerCase()) !== -1;
       });
