@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sip & Craft — Thực Đơn Đồ Uống</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0e0c0a;
+      --surface: #1a1612;
+      --surface2: #231e18;
+      --border: #3a3028;
+      --gold: #c9a84c;
+      --gold-light: #e8c97e;
+      --gold-dim: rgba(201,168,76,0.15);
+      --text: #f0e8d8;
+      --text-muted: #8a7d6a;
+      --red: #d45c4a;
+      --green: #5aaa82;
+      --radius: 14px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Noise texture overlay ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0;
+      opacity: .03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      pointer-events: none;
+    }
+
+    /* ── Header ── */
+    header {
+      position: relative; z-index: 10;
+      padding: 48px 40px 32px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(201,168,76,.06) 0%, transparent 100%);
+      display: flex; align-items: flex-end; justify-content: space-between; gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .logo-block { display: flex; flex-direction: column; gap: 4px; }
+
+    .logo-eyebrow {
+      font-size: 10px; letter-spacing: .25em; text-transform: uppercase;
+      color: var(--gold); font-weight: 500;
+    }
+
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(36px, 6vw, 64px);
+      line-height: 1; color: var(--gold-light);
+      text-shadow: 0 0 60px rgba(201,168,76,.25);
+    }
+
+    .logo em { font-style: italic; color: var(--text-muted); }
+
+    .header-actions { display: flex; gap: 12px; align-items: center; }
+
+    /* ── Search ── */
+    .search-wrap {
+      position: relative;
+    }
+    .search-wrap svg {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      width: 16px; height: 16px; color: var(--text-muted); pointer-events: none;
+    }
+    .search-input {
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--text); font-family: 'DM Sans', sans-serif;
+      font-size: 14px; padding: 10px 16px 10px 40px;
+      border-radius: 99px; width: 220px; outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .search-input::placeholder { color: var(--text-muted); }
+    .search-input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,76,.12); }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 11px 22px; border-radius: 99px; border: none;
+      font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
+      cursor: pointer; transition: all .2s; white-space: nowrap;
+    }
+    .btn-gold {
+      background: var(--gold); color: #1a1200;
+    }
+    .btn-gold:hover { background: var(--gold-light); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(201,168,76,.3); }
+    .btn-ghost {
+      background: transparent; color: var(--text-muted); border: 1px solid var(--border);
+    }
+    .btn-ghost:hover { border-color: var(--text-muted); color: var(--text); }
+    .btn-danger {
+      background: transparent; color: var(--red); border: 1px solid transparent; padding: 6px 10px; border-radius: 8px;
+    }
+    .btn-danger:hover { background: rgba(212,92,74,.12); border-color: rgba(212,92,74,.3); }
+
+    /* ── Main Layout ── */
+    main { position: relative; z-index: 1; padding: 40px; max-width: 1400px; margin: 0 auto; }
+
+    /* ── Filter tabs ── */
+    .filter-bar {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 36px;
+    }
+    .filter-tab {
+      padding: 7px 18px; border-radius: 99px; font-size: 13px; font-weight: 500;
+      border: 1px solid var(--border); background: transparent; color: var(--text-muted);
+      cursor: pointer; transition: all .2s;
+    }
+    .filter-tab:hover { border-color: var(--gold); color: var(--gold); }
+    .filter-tab.active { background: var(--gold-dim); border-color: var(--gold); color: var(--gold); }
+
+    /* ── Stats bar ── */
+    .stats {
+      display: flex; gap: 32px; margin-bottom: 40px; flex-wrap: wrap;
+    }
+    .stat { display: flex; flex-direction: column; gap: 2px; }
+    .stat-num {
+      font-family: 'Playfair Display', serif; font-size: 32px; color: var(--gold-light);
+      line-height: 1;
+    }
+    .stat-label { font-size: 12px; color: var(--text-muted); letter-spacing: .05em; }
+
+    /* ── Grid ── */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: transform .25s, box-shadow .25s, border-color .25s;
+      display: flex; flex-direction: column;
+      animation: fadeUp .4s ease both;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 48px rgba(0,0,0,.5);
+      border-color: var(--gold);
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .card-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 12px; font-size: 11px; font-weight: 500;
+      letter-spacing: .08em; text-transform: uppercase; border-radius: 99px;
+      background: var(--gold-dim); color: var(--gold); border: 1px solid rgba(201,168,76,.2);
+    }
+
+    .card-header {
+      padding: 24px 24px 0;
+      display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
+    }
+
+    .card-icon {
+      width: 48px; height: 48px; border-radius: 12px;
+      background: var(--gold-dim); display: flex; align-items: center; justify-content: center;
+      font-size: 22px; flex-shrink: 0;
+    }
+
+    .card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px; color: var(--text); margin-top: 16px; padding: 0 24px;
+      line-height: 1.3;
+    }
+
+    .card-desc {
+      font-size: 13px; color: var(--text-muted); padding: 8px 24px 0;
+      line-height: 1.6; flex: 1;
+    }
+
+    .card-divider { height: 1px; background: var(--border); margin: 20px 24px; }
+
+    .card-section-label {
+      font-size: 10px; letter-spacing: .2em; text-transform: uppercase;
+      color: var(--text-muted); padding: 0 24px 10px; font-weight: 500;
+    }
+
+    .ingredients-list {
+      list-style: none; padding: 0 24px; display: flex; flex-direction: column; gap: 6px;
+    }
+    .ingredients-list li {
+      display: flex; align-items: center; gap: 10px; font-size: 13px;
+    }
+    .ingredients-list li::before {
+      content: ''; width: 6px; height: 6px; border-radius: 50%;
+      background: var(--gold); flex-shrink: 0; opacity: .7;
+    }
+
+    .card-steps {
+      padding: 0 24px; font-size: 13px; color: var(--text-muted);
+      line-height: 1.7; white-space: pre-wrap;
+    }
+
+    .card-footer {
+      padding: 16px 24px 20px;
+      display: flex; justify-content: flex-end; gap: 8px; margin-top: auto;
+    }
+
+    /* ── Empty state ── */
+    .empty-state {
+      grid-column: 1 / -1;
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 16px;
+      padding: 80px 24px; text-align: center;
+      color: var(--text-muted);
+    }
+    .empty-icon { font-size: 56px; opacity: .4; }
+    .empty-state h3 { font-family: 'Playfair Display', serif; font-size: 24px; color: var(--text); }
+
+    /* ── Modal ── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 100;
+      background: rgba(0,0,0,.7); backdrop-filter: blur(8px);
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px;
+      opacity: 0; pointer-events: none; transition: opacity .25s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+    .modal {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 20px; width: 100%; max-width: 560px;
+      max-height: 90vh; overflow-y: auto;
+      transform: translateY(20px) scale(.97); transition: transform .25s;
+      scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+    }
+    .modal-overlay.open .modal { transform: translateY(0) scale(1); }
+
+    .modal-header {
+      padding: 28px 28px 0;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .modal-title {
+      font-family: 'Playfair Display', serif; font-size: 26px; color: var(--gold-light);
+    }
+    .modal-close {
+      width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border);
+      background: transparent; color: var(--text-muted); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; transition: all .15s;
+    }
+    .modal-close:hover { border-color: var(--red); color: var(--red); }
+
+    .modal-body { padding: 24px 28px 28px; display: flex; flex-direction: column; gap: 20px; }
+
+    .field { display: flex; flex-direction: column; gap: 8px; }
+    .field label {
+      font-size: 12px; letter-spacing: .1em; text-transform: uppercase;
+      color: var(--text-muted); font-weight: 500;
+    }
+    .field input, .field textarea, .field select {
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px;
+      padding: 12px 14px; border-radius: 10px; outline: none;
+      transition: border-color .2s, box-shadow .2s; width: 100%; resize: vertical;
+    }
+    .field input::placeholder, .field textarea::placeholder { color: var(--text-muted); }
+    .field input:focus, .field textarea:focus, .field select:focus {
+      border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,76,.1);
+    }
+    .field select option { background: var(--surface2); }
+    .field textarea { min-height: 80px; }
+
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+    .ingredient-rows { display: flex; flex-direction: column; gap: 8px; }
+    .ingredient-row { display: flex; gap: 8px; }
+    .ingredient-row input { flex: 1; }
+    .ingredient-row .ing-unit { width: 90px; flex-shrink: 0; }
+    .btn-add-ing {
+      border: 1px dashed var(--border); background: transparent; color: var(--text-muted);
+      font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 10px;
+      border-radius: 10px; cursor: pointer; transition: all .2s; width: 100%;
+      margin-top: 4px;
+    }
+    .btn-add-ing:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-dim); }
+    .btn-remove-ing {
+      width: 34px; flex-shrink: 0; border-radius: 8px; border: 1px solid var(--border);
+      background: transparent; color: var(--text-muted); cursor: pointer;
+      transition: all .15s; font-size: 16px;
+    }
+    .btn-remove-ing:hover { border-color: var(--red); color: var(--red); }
+
+    .modal-footer {
+      padding: 0 28px 28px;
+      display: flex; justify-content: flex-end; gap: 10px;
+    }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed; bottom: 32px; right: 32px; z-index: 999;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-left: 3px solid var(--green);
+      padding: 14px 20px; border-radius: 10px;
+      font-size: 14px; color: var(--text);
+      box-shadow: 0 16px 40px rgba(0,0,0,.5);
+      transform: translateY(20px); opacity: 0;
+      transition: all .3s; pointer-events: none;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.del { border-left-color: var(--red); }
+
+    /* ── Confirm dialog ── */
+    .confirm-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,.6); backdrop-filter: blur(6px);
+      display: flex; align-items: center; justify-content: center; padding: 24px;
+      opacity: 0; pointer-events: none; transition: opacity .2s;
+    }
+    .confirm-overlay.open { opacity: 1; pointer-events: all; }
+    .confirm-box {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 32px; max-width: 380px; width: 100%;
+      text-align: center; transform: scale(.95); transition: transform .2s;
+    }
+    .confirm-overlay.open .confirm-box { transform: scale(1); }
+    .confirm-icon { font-size: 40px; margin-bottom: 16px; }
+    .confirm-box h3 { font-family: 'Playfair Display', serif; font-size: 22px; margin-bottom: 8px; }
+    .confirm-box p { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; }
+    .confirm-actions { display: flex; gap: 10px; justify-content: center; }
+    .btn-confirm-del { background: var(--red); color: #fff; border: none; }
+    .btn-confirm-del:hover { background: #e8705e; }
+
+    /* ── Responsive ── */
+    @media (max-width: 640px) {
+      header { padding: 32px 20px 20px; flex-direction: column; align-items: flex-start; }
+      main { padding: 24px 16px; }
+      .field-row { grid-template-columns: 1fr; }
+      .search-input { width: 180px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+  <div class="logo-block">
+    <span class="logo-eyebrow">✦ Quản lý công thức</span>
+    <div class="logo">Sip <em>&amp;</em> Craft</div>
+  </div>
+  <div class="header-actions">
+    <div class="search-wrap">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+      </svg>
+      <input class="search-input" id="searchInput" type="text" placeholder="Tìm công thức…" oninput="renderCards()" />
+    </div>
+    <button class="btn btn-gold" onclick="openModal()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+      Thêm công thức
+    </button>
+  </div>
+</header>
+
+<!-- Main -->
+<main>
+  <!-- Stats -->
+  <div class="stats" id="stats"></div>
+
+  <!-- Filters -->
+  <div class="filter-bar" id="filterBar"></div>
+
+  <!-- Cards -->
+  <div class="grid" id="cardGrid"></div>
+</main>
+
+<!-- Add/Edit Modal -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">Công thức mới</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field-row">
+        <div class="field">
+          <label>Tên đồ uống *</label>
+          <input id="fName" placeholder="VD: Caramel Macchiato" />
+        </div>
+        <div class="field">
+          <label>Biểu tượng (emoji)</label>
+          <input id="fEmoji" placeholder="☕" maxlength="4" />
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Danh mục *</label>
+          <select id="fCategory">
+            <option value="">— Chọn danh mục —</option>
+            <option>☕ Cà phê</option>
+            <option>🍵 Trà</option>
+            <option>🧋 Trà sữa</option>
+            <option>🥤 Sinh tố / Nước ép</option>
+            <option>🍹 Cocktail / Mocktail</option>
+            <option>🧃 Nước ngọt</option>
+            <option>🍫 Chocolate</option>
+            <option>❄️ Đồ uống lạnh</option>
+            <option>🔥 Đồ uống nóng</option>
+            <option>✨ Đặc biệt</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Độ khó</label>
+          <select id="fDifficulty">
+            <option value="Dễ">⭐ Dễ</option>
+            <option value="Trung bình">⭐⭐ Trung bình</option>
+            <option value="Khó">⭐⭐⭐ Khó</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Thời gian pha (phút)</label>
+          <input id="fTime" type="number" min="1" placeholder="5" />
+        </div>
+        <div class="field">
+          <label>Khẩu phần</label>
+          <input id="fServing" placeholder="1 ly" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Mô tả ngắn</label>
+        <input id="fDesc" placeholder="Một câu mô tả hấp dẫn về thức uống…" />
+      </div>
+
+      <div class="field">
+        <label>Nguyên liệu *</label>
+        <div class="ingredient-rows" id="ingredientRows"></div>
+        <button class="btn-add-ing" onclick="addIngredientRow()">+ Thêm nguyên liệu</button>
+      </div>
+
+      <div class="field">
+        <label>Cách pha chế *</label>
+        <textarea id="fSteps" rows="5" placeholder="Mô tả từng bước pha chế…&#10;1. Bước đầu tiên…&#10;2. Bước tiếp theo…"></textarea>
+      </div>
+
+      <div class="field">
+        <label>Ghi chú / Mẹo</label>
+        <textarea id="fNotes" rows="3" placeholder="Ghi chú thêm, mẹo hay, biến tấu…"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal()">Hủy</button>
+      <button class="btn btn-gold" onclick="saveRecipe()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M5 13l4 4L19 7"/></svg>
+        Lưu công thức
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Delete -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <div class="confirm-icon">🗑️</div>
+    <h3>Xóa công thức?</h3>
+    <p>Hành động này không thể hoàn tác. Công thức sẽ bị xóa vĩnh viễn.</p>
+    <div class="confirm-actions">
+      <button class="btn btn-ghost" onclick="closeConfirm()">Giữ lại</button>
+      <button class="btn btn-gold btn-confirm-del" id="confirmDeleteBtn">Xóa ngay</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+  // ── State ──────────────────────────────────────────────────────────────────
+  const STORAGE_KEY = 'sip_craft_recipes_v1';
+  let recipes = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  let editingId = null;
+  let activeFilter = 'all';
+  let deletingId = null;
+
+  // ── Seed data (first launch) ───────────────────────────────────────────────
+  if (!recipes.length) {
+    recipes = [
+      {
+        id: uid(), name: 'Vietnamese Iced Coffee', emoji: '☕',
+        category: '☕ Cà phê', difficulty: 'Dễ', time: '5', serving: '1 ly',
+        desc: 'Cà phê phin đặc truyền thống, pha với sữa đặc và đá.',
+        ingredients: [
+          { name: 'Cà phê phin (pha sẵn)', amount: '60ml' },
+          { name: 'Sữa đặc có đường', amount: '2 muỗng canh' },
+          { name: 'Đá viên', amount: 'vừa đủ' },
+        ],
+        steps: '1. Pha cà phê phin ra ly, để nguội.\n2. Cho sữa đặc vào đáy ly.\n3. Thêm đá, rồi đổ cà phê lên trên.\n4. Khuấy nhẹ trước khi uống.',
+        notes: 'Dùng cà phê rang xay Buôn Ma Thuột để đậm vị hơn.',
+        createdAt: Date.now() - 86400000
+      },
+      {
+        id: uid(), name: 'Matcha Latte', emoji: '🍵',
+        category: '🍵 Trà', difficulty: 'Trung bình', time: '7', serving: '1 ly',
+        desc: 'Matcha Nhật Bản cao cấp hòa quyện cùng sữa tươi mịn màng.',
+        ingredients: [
+          { name: 'Bột matcha ceremonial', amount: '2g' },
+          { name: 'Nước nóng 75°C', amount: '30ml' },
+          { name: 'Sữa tươi', amount: '200ml' },
+          { name: 'Syrup đường', amount: '1 muỗng canh' },
+        ],
+        steps: '1. Rây bột matcha vào bát.\n2. Thêm nước nóng, đánh bằng chổi tre theo hình chữ W cho tan hết cục.\n3. Đun nóng và tạo bọt sữa.\n4. Cho đá vào ly, đổ matcha trước, rồi đổ sữa nhẹ nhàng.',
+        notes: 'Nước không được quá nóng sẽ làm matcha bị đắng.',
+        createdAt: Date.now() - 43200000
+      },
+      {
+        id: uid(), name: 'Trà Sữa Taro', emoji: '🧋',
+        category: '🧋 Trà sữa', difficulty: 'Trung bình', time: '15', serving: '2 ly',
+        desc: 'Trà sữa khoai môn thơm ngon với trân châu đen dai dẻo đặc trưng.',
+        ingredients: [
+          { name: 'Trà đen (pha đặc)', amount: '300ml' },
+          { name: 'Bột khoai môn taro', amount: '3 muỗng canh' },
+          { name: 'Sữa tươi', amount: '150ml' },
+          { name: 'Trân châu đen (nấu sẵn)', amount: '100g' },
+          { name: 'Syrup đường nâu', amount: '2 muỗng canh' },
+          { name: 'Đá xay', amount: 'vừa đủ' },
+        ],
+        steps: '1. Pha trà đen đặc, để nguội.\n2. Blender bột taro + sữa + trà cho đều.\n3. Cho trân châu vào đáy ly cùng syrup.\n4. Thêm đá, đổ hỗn hợp trà taro vào.\n5. Đậy nắp và lắc đều.',
+        notes: 'Trân châu nên nấu ≤ 30 phút trước để giữ độ dai.',
+        createdAt: Date.now()
+      }
+    ];
+    save();
+  }
+
+  // ── Utilities ──────────────────────────────────────────────────────────────
+  function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
+  function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(recipes)); }
+
+  function showToast(msg, type = '') {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.className = 'toast show ' + type;
+    setTimeout(() => { t.className = 'toast ' + type; }, 3000);
+  }
+
+  // ── Render ─────────────────────────────────────────────────────────────────
+  function getCategories() {
+    return [...new Set(recipes.map(r => r.category).filter(Boolean))];
+  }
+
+  function renderStats() {
+    const cats = getCategories();
+    document.getElementById('stats').innerHTML = `
+      <div class="stat"><div class="stat-num">${recipes.length}</div><div class="stat-label">Công thức</div></div>
+      <div class="stat"><div class="stat-num">${cats.length}</div><div class="stat-label">Danh mục</div></div>
+    `;
+  }
+
+  function renderFilters() {
+    const cats = getCategories();
+    const bar = document.getElementById('filterBar');
+    bar.innerHTML = `<button class="filter-tab ${activeFilter === 'all' ? 'active' : ''}" onclick="setFilter('all')">Tất cả (${recipes.length})</button>` +
+      cats.map(c => {
+        const count = recipes.filter(r => r.category === c).length;
+        return `<button class="filter-tab ${activeFilter === c ? 'active' : ''}" onclick="setFilter('${CSS.escape(c)}')">${c} (${count})</button>`;
+      }).join('');
+  }
+
+  function setFilter(f) { activeFilter = f; renderCards(); }
+
+  function renderCards() {
+    const q = document.getElementById('searchInput').value.toLowerCase();
+    let list = recipes.filter(r => {
+      const matchCat = activeFilter === 'all' || r.category === activeFilter;
+      const matchQ = !q || r.name.toLowerCase().includes(q) || (r.desc || '').toLowerCase().includes(q) || (r.category || '').toLowerCase().includes(q);
+      return matchCat && matchQ;
+    });
+
+    renderStats();
+    renderFilters();
+
+    const grid = document.getElementById('cardGrid');
+    if (!list.length) {
+      grid.innerHTML = `<div class="empty-state">
+        <div class="empty-icon">🍹</div>
+        <h3>Chưa có công thức nào</h3>
+        <p style="color:var(--text-muted);font-size:14px;margin-top:4px">Nhấn <strong>Thêm công thức</strong> để bắt đầu xây dựng thực đơn của bạn.</p>
+      </div>`;
+      return;
+    }
+
+    grid.innerHTML = list.map((r, i) => `
+      <div class="card" style="animation-delay:${i * 60}ms">
+        <div class="card-header">
+          <div class="card-icon">${r.emoji || '🥤'}</div>
+          <span class="card-badge">${r.category || 'Chưa phân loại'}</span>
+        </div>
+        <div class="card-title">${r.name}</div>
+        ${r.desc ? `<div class="card-desc">${r.desc}</div>` : ''}
+        <div style="display:flex;gap:12px;padding:10px 24px 0;flex-wrap:wrap;">
+          ${r.difficulty ? `<span style="font-size:12px;color:var(--text-muted)">🎯 ${r.difficulty}</span>` : ''}
+          ${r.time ? `<span style="font-size:12px;color:var(--text-muted)">⏱ ${r.time} phút</span>` : ''}
+          ${r.serving ? `<span style="font-size:12px;color:var(--text-muted)">🍶 ${r.serving}</span>` : ''}
+        </div>
+        <div class="card-divider"></div>
+        ${r.ingredients && r.ingredients.length ? `
+          <div class="card-section-label">Nguyên liệu</div>
+          <ul class="ingredients-list">
+            ${r.ingredients.slice(0, 4).map(ing => `<li><span style="color:var(--text-muted)">${ing.amount}</span>&nbsp;${ing.name}</li>`).join('')}
+            ${r.ingredients.length > 4 ? `<li style="color:var(--text-muted);font-style:italic">+${r.ingredients.length - 4} nguyên liệu khác…</li>` : ''}
+          </ul>
+        ` : ''}
+        ${r.steps ? `
+          <div class="card-divider"></div>
+          <div class="card-section-label">Cách pha chế</div>
+          <div class="card-steps">${r.steps.length > 180 ? r.steps.slice(0, 180) + '…' : r.steps}</div>
+        ` : ''}
+        ${r.notes ? `<div style="margin:12px 24px 0;padding:10px 14px;background:var(--gold-dim);border-radius:8px;font-size:12px;color:var(--gold);">💡 ${r.notes}</div>` : ''}
+        <div class="card-footer">
+          <button class="btn btn-ghost" style="font-size:13px;padding:7px 16px" onclick="openModal('${r.id}')">✏️ Sửa</button>
+          <button class="btn btn-danger" onclick="confirmDelete('${r.id}')">🗑️ Xóa</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // ── Modal ──────────────────────────────────────────────────────────────────
+  function openModal(id = null) {
+    editingId = id;
+    const overlay = document.getElementById('modalOverlay');
+    const title = document.getElementById('modalTitle');
+    resetForm();
+
+    if (id) {
+      const r = recipes.find(x => x.id === id);
+      if (!r) return;
+      title.textContent = 'Chỉnh sửa công thức';
+      document.getElementById('fName').value = r.name || '';
+      document.getElementById('fEmoji').value = r.emoji || '';
+      document.getElementById('fCategory').value = r.category || '';
+      document.getElementById('fDifficulty').value = r.difficulty || 'Dễ';
+      document.getElementById('fTime').value = r.time || '';
+      document.getElementById('fServing').value = r.serving || '';
+      document.getElementById('fDesc').value = r.desc || '';
+      document.getElementById('fSteps').value = r.steps || '';
+      document.getElementById('fNotes').value = r.notes || '';
+      const ings = r.ingredients || [];
+      ings.forEach(ing => addIngredientRow(ing.name, ing.amount));
+      if (!ings.length) addIngredientRow();
+    } else {
+      title.textContent = 'Công thức mới';
+      addIngredientRow();
+    }
+
+    overlay.classList.add('open');
+    document.getElementById('fName').focus();
+  }
+
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('open');
+    editingId = null;
+  }
+
+  function resetForm() {
+    ['fName','fEmoji','fCategory','fDifficulty','fTime','fServing','fDesc','fSteps','fNotes'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el.tagName === 'SELECT') el.selectedIndex = 0;
+      else el.value = '';
+    });
+    document.getElementById('ingredientRows').innerHTML = '';
+  }
+
+  function addIngredientRow(name = '', amount = '') {
+    const row = document.createElement('div');
+    row.className = 'ingredient-row';
+    row.innerHTML = `
+      <input class="ing-name" placeholder="Tên nguyên liệu" value="${name}" style="flex:1"/>
+      <input class="ing-amount ing-unit" placeholder="Số lượng" value="${amount}"/>
+      <button class="btn-remove-ing" onclick="this.parentElement.remove()" title="Xóa">−</button>
+    `;
+    document.getElementById('ingredientRows').appendChild(row);
+    row.querySelector('.ing-name').focus();
+  }
+
+  function saveRecipe() {
+    const name = document.getElementById('fName').value.trim();
+    const category = document.getElementById('fCategory').value;
+    if (!name) { alert('Vui lòng nhập tên đồ uống!'); return; }
+    if (!category) { alert('Vui lòng chọn danh mục!'); return; }
+
+    const ingRows = document.querySelectorAll('#ingredientRows .ingredient-row');
+    const ingredients = [...ingRows].map(row => ({
+      name: row.querySelector('.ing-name').value.trim(),
+      amount: row.querySelector('.ing-amount').value.trim()
+    })).filter(i => i.name);
+
+    const data = {
+      name,
+      emoji: document.getElementById('fEmoji').value || '🥤',
+      category,
+      difficulty: document.getElementById('fDifficulty').value,
+      time: document.getElementById('fTime').value,
+      serving: document.getElementById('fServing').value.trim(),
+      desc: document.getElementById('fDesc').value.trim(),
+      ingredients,
+      steps: document.getElementById('fSteps').value.trim(),
+      notes: document.getElementById('fNotes').value.trim(),
+    };
+
+    if (editingId) {
+      const idx = recipes.findIndex(r => r.id === editingId);
+      if (idx !== -1) { recipes[idx] = { ...recipes[idx], ...data }; }
+      showToast('✅ Đã cập nhật công thức!');
+    } else {
+      recipes.unshift({ id: uid(), createdAt: Date.now(), ...data });
+      showToast('🍹 Đã thêm công thức mới!');
+    }
+
+    save(); closeModal(); renderCards();
+  }
+
+  // ── Delete ─────────────────────────────────────────────────────────────────
+  function confirmDelete(id) {
+    deletingId = id;
+    document.getElementById('confirmOverlay').classList.add('open');
+  }
+  function closeConfirm() {
+    deletingId = null;
+    document.getElementById('confirmOverlay').classList.remove('open');
+  }
+
+  document.getElementById('confirmDeleteBtn').onclick = function () {
+    if (!deletingId) return;
+    recipes = recipes.filter(r => r.id !== deletingId);
+    save(); closeConfirm(); renderCards();
+    showToast('🗑️ Đã xóa công thức.', 'del');
+  };
+
+  // ── Close on overlay click ─────────────────────────────────────────────────
+  document.getElementById('modalOverlay').addEventListener('click', function (e) {
+    if (e.target === this) closeModal();
+  });
+  document.getElementById('confirmOverlay').addEventListener('click', function (e) {
+    if (e.target === this) closeConfirm();
+  });
+
+  // ── Keyboard shortcuts ─────────────────────────────────────────────────────
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { closeModal(); closeConfirm(); }
+  });
+
+  // ── Init ───────────────────────────────────────────────────────────────────
+  renderCards();
+</script>
+</body>
+</html>
