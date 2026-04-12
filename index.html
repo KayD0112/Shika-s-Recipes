@@ -451,17 +451,25 @@
 
   function renderFilters() {
     const cats = getCategories();
-    document.getElementById('filterBar').innerHTML =
-      '<button class="filter-tab ' + (activeFilter==='all'?'active':'') + '" onclick="setFilter('all')">Tất cả (' + recipes.length + ')</button>' +
-      cats.map(function(c) {
-        var n = recipes.filter(function(r){return r.category===c;}).length;
-        return '<button class="filter-tab ' + (activeFilter===c?'active':'') + '" onclick="setFilter(`' + c + '`)">' + c + ' (' + n + ')</button>';
-      }).join('');
+    const allBtn = document.createElement('button');
+    allBtn.className = 'filter-tab' + (activeFilter==='all' ? ' active' : '');
+    allBtn.textContent = 'Tất cả (' + recipes.length + ')';
+    allBtn.onclick = function() { setFilter('all'); };
+    const bar = document.getElementById('filterBar');
+    bar.innerHTML = '';
+    bar.appendChild(allBtn);
+    cats.forEach(function(c) {
+      const n = recipes.filter(function(r){return r.category===c;}).length;
+      const btn = document.createElement('button');
+      btn.className = 'filter-tab' + (activeFilter===c ? ' active' : '');
+      btn.textContent = c + ' (' + n + ')';
+      btn.onclick = function() { setFilter(c); };
+      bar.appendChild(btn);
+    });
 
     // Ingredient filter pills
     var ingBar = document.getElementById('ingFilterBar');
     if (!ingBar) return;
-    // Count how many recipes use each ingredient
     var ingCounts = {};
     recipes.forEach(function(r) {
       (r.ingredients||[]).forEach(function(i) {
@@ -469,14 +477,25 @@
       });
     });
     var topIngs = Object.entries(ingCounts).sort(function(a,b){return b[1]-a[1];}).slice(0,20);
-    if (!topIngs.length) { ingBar.innerHTML = ''; return; }
-    ingBar.innerHTML =
-      '<span class="ing-filter-label">🧪 Lọc theo nguyên liệu:</span>' +
-      '<button class="ing-filter-pill ' + (!activeIngFilter?'active':'') + '" onclick="setIngFilter(null)">Tất cả</button>' +
-      topIngs.map(function(entry) {
-        var name = entry[0], count = entry[1];
-        return '<button class="ing-filter-pill ' + (activeIngFilter===name?'active':'') + '" onclick="setIngFilter('' + name.replace(/'/g,"\'") + '')">' + name + ' <span>' + count + '</span></button>';
-      }).join('');
+    ingBar.innerHTML = '';
+    if (!topIngs.length) return;
+    const label = document.createElement('span');
+    label.className = 'ing-filter-label';
+    label.textContent = '🧪 Lọc theo nguyên liệu:';
+    ingBar.appendChild(label);
+    const allPill = document.createElement('button');
+    allPill.className = 'ing-filter-pill' + (!activeIngFilter ? ' active' : '');
+    allPill.textContent = 'Tất cả';
+    allPill.onclick = function() { setIngFilter(null); };
+    ingBar.appendChild(allPill);
+    topIngs.forEach(function(entry) {
+      var name = entry[0], count = entry[1];
+      const pill = document.createElement('button');
+      pill.className = 'ing-filter-pill' + (activeIngFilter===name ? ' active' : '');
+      pill.innerHTML = name + ' <span>' + count + '</span>';
+      pill.onclick = function() { setIngFilter(name); };
+      ingBar.appendChild(pill);
+    });
   }
 
   function setIngFilter(name) {
