@@ -425,7 +425,8 @@
     document.getElementById('page-' + page).classList.add('active');
     document.querySelectorAll('.page-tab')[page === 'recipes' ? 0 : 1].classList.add('active');
     document.getElementById('searchWrap').style.display = page === 'recipes' ? '' : 'none';
-    document.getElementById('addBtn').style.display = page === 'recipes' ? '' : 'none';
+    // Chỉ hiện nút Thêm khi là trang công thức VÀ là admin
+    document.getElementById('addBtn').style.display = (page === 'recipes' && isAdmin()) ? '' : 'none';
     if (page === 'ingredients') renderIngredients();
   }
 
@@ -446,6 +447,7 @@
       ingredientList = data.ingredientList || [];
       console.log('[Shika] Loaded:', recipes.length, 'recipes,', ingredientList.length, 'ingredients');
       renderCards();
+      if (currentRole) updateUserBadge(); // reapply role restrictions after load
     } catch (err) {
       const msg = err.name === 'AbortError'
         ? 'Kết nối quá chậm (timeout 15s). Thử lại hoặc kiểm tra Apps Script.'
