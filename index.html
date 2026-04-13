@@ -134,6 +134,9 @@
     .ing-card-unit { font-size:12px;color:var(--text-muted); }
     .ing-delete { background:transparent;border:none;color:var(--text-muted);cursor:pointer;font-size:16px;padding:4px 6px;border-radius:6px;transition:all .15s; }
     .ing-delete:hover { color:var(--red);background:rgba(212,92,74,.1); }
+    .ing-change-img { background:transparent;border:none;color:var(--text-muted);cursor:pointer;font-size:14px;padding:4px 6px;border-radius:6px;transition:all .15s; }
+    .ing-change-img:hover { color:var(--gold);background:var(--gold-dim); }
+    .ing-card-actions { display:flex;gap:2px;align-items:center; }
     .ing-count { font-size:12px;color:var(--text-muted);margin-bottom:16px; }
 
     /* ── Modal ── */
@@ -426,7 +429,7 @@
   // ── State ──────────────────────────────────────────────────────
   const API_KEY = 'sip_craft_api_url';
   // ⚙️ Nhúng URL vào đây để dùng trên mọi thiết bị không cần nhập lại
-  const DEFAULT_API_URL = 'https://script.google.com/macros/s/AKfycbwS0qGoRT0aRhydsGP0O9a462gpcy59mN_MlbUjFUQfWyI-uT_W3AInqzdlIwnA6-ML/exec';
+  const DEFAULT_API_URL = 'ĐẶT_URL_CỦA_BẠN_VÀO_ĐÂY';
   let API_URL = localStorage.getItem(API_KEY) || (DEFAULT_API_URL.startsWith('https') ? DEFAULT_API_URL : '');
   if (API_URL && !localStorage.getItem(API_KEY)) localStorage.setItem(API_KEY, API_URL);
   let authToken = localStorage.getItem('shika_token') || '';
@@ -678,8 +681,54 @@
     } catch(err) { showToast('❌ '+err.message,'err'); }
   }
 
+  function changeIngImage(name, btn) {
+    const fileInput = btn.closest('[style*="position:relative"]').querySelector('input[type="file"]');
+    fileInput.click();
+  }
+
+  async function handleIngCardImgUpload(input, name) {
+    const file = input.files[0];
+    if (!file) return;
+    const ing = ingredientList.find(i => i.name === name);
+    showToast('⏳ Đang upload ảnh…');
+    try {
+      // Xóa ảnh cũ trên Drive nếu có
+      if (ing && ing.image) await deleteFromDrive(ing.image);
+      const url = await uploadToDrive(file);
+      // Cập nhật lên sheet
+      await apiPost({ action:'updateIngredientImage', name, image: url });
+      // Cập nhật local
+      if (ing) ing.image = url;
+      renderIngredients();
+      showToast('✅ Đã cập nhật ảnh!');
+    } catch(err) { showToast('❌ ' + err.message, 'err'); }
+  }
+
+  async function removeIngImage(name, btn) {
+    const ing = ingredientList.find(i => i.name === name);
+    if (!ing || !ing.image) return;
+    try {
+      await deleteFromDrive(ing.image);
+      await apiPost({ action:'updateIngredientImage', name, image: '' });
+      ing.image = '';
+      renderIngredients();
+      showToast('🗑️ Đã xóa ảnh.');
+    } catch(err) { showToast('❌ ' + err.message, 'err'); }
+  }
+
   async function deleteIngredient(name) {
-    if (!confirm(`Xóa nguyên liệu "${name}"?`)) return;
+    // Kiểm tra công thức nào đang dùng nguyên liệu này
+    const usingRecipes = recipes.filter(r =>
+      (r.ingredients||[]).some(i => i.name === name)
+    );
+
+    let confirmMsg = `Xóa nguyên liệu "${name}"?`;
+    if (usingRecipes.length > 0) {
+      const recipeNames = usingRecipes.map(r => '• ' + r.name).join('\n');
+      confirmMsg = `⚠️ "${name}" đang được dùng trong ${usingRecipes.length} công thức:\n\n${recipeNames}\n\nCác công thức đó vẫn giữ nguyên, chỉ xóa khỏi danh sách gợi ý.\n\nBạn có chắc muốn xóa không?`;
+    }
+
+    if (!confirm(confirmMsg)) return;
     try {
       const ingToDelete = ingredientList.find(i => i.name === name);
       if (ingToDelete && ingToDelete.image) await deleteFromDrive(ingToDelete.image);
