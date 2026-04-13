@@ -914,11 +914,16 @@
           const base64   = dataUrl.split(',')[1];
           const mimeType = file.type;
           const fileName = file.name;
+              const payload = { action:'uploadImage', token:authToken, data:base64, mimeType, fileName };
+          console.log('[Upload] Sending to:', API_URL, 'action:', payload.action, 'token set:', !!payload.token);
           const res  = await fetch(API_URL, {
             method: 'POST',
-            body: JSON.stringify({ action:'uploadImage', token:authToken, data:base64, mimeType, fileName })
+            body: JSON.stringify(payload)
           });
-          const data = await res.json();
+          const text = await res.text();
+          console.log('[Upload] Response:', text.substring(0,200));
+          let data;
+          try { data = JSON.parse(text); } catch(e) { throw new Error('Response không hợp lệ: ' + text.substring(0,100)); }
           if (data.error) reject(new Error(data.error));
           else resolve(data.url);
         } catch(err) { reject(err); }
