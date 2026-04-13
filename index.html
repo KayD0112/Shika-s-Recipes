@@ -245,6 +245,19 @@
     .img-input-wrap { position:relative; }
     .img-preview { width:100%;height:140px;object-fit:cover;border-radius:10px;margin-top:8px;display:none;border:1px solid var(--border); }
     .img-preview.show { display:block; }
+
+    /* ── Image upload ── */
+    .img-upload-wrap { display:flex;flex-direction:column;gap:8px; }
+    .img-upload-btn { background:var(--surface2);border:2px dashed var(--border);border-radius:10px;padding:16px;text-align:center;cursor:pointer;font-size:14px;color:var(--text-muted);transition:all .2s; }
+    .img-upload-btn:hover { border-color:var(--gold);color:var(--gold);background:var(--gold-dim); }
+    .img-upload-btn.uploading { border-color:var(--gold);color:var(--gold);cursor:wait; }
+    .img-preview { width:100%;max-height:220px;object-fit:cover;border-radius:10px;display:none;border:1px solid var(--border); }
+    .img-preview.show { display:block; }
+    .img-remove-btn { background:rgba(212,92,74,.12);border:1px solid rgba(212,92,74,.3);color:var(--red);border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;transition:all .2s;align-self:flex-start; }
+    .img-remove-btn:hover { background:rgba(212,92,74,.25); }
+    .ing-img-upload { background:var(--surface2);border:1px dashed var(--border);border-radius:10px;padding:9px 14px;cursor:pointer;font-size:13px;color:var(--text-muted);transition:all .2s;white-space:nowrap;display:flex;align-items:center;gap:6px; }
+    .ing-img-upload:hover { border-color:var(--green);color:var(--green);background:var(--green-dim); }
+    .ing-img-upload.has-img { border-color:var(--green);color:var(--green);background:var(--green-dim); }
   </style>
 </head>
 <body>
@@ -312,7 +325,11 @@
     <div class="ing-add-row">
       <input id="newIngName" placeholder="Tên nguyên liệu mới…" onkeydown="if(event.key==='Enter')addIngredient()" />
       <input id="newIngUnit" placeholder="Đơn vị (ml, g, muỗng…)" style="max-width:140px" onkeydown="if(event.key==='Enter')addIngredient()" />
-      <input id="newIngImage" placeholder="Link ảnh nguyên liệu (https://...)" style="min-width:220px" onkeydown="if(event.key==='Enter')addIngredient()" />
+      <div class="ing-img-upload" onclick="document.getElementById('newIngImageFile').click()" id="ingImgUploadBtn">
+        <input type="file" id="newIngImageFile" accept="image/*" onchange="handleIngImgUpload(this)" style="display:none" />
+        <input type="hidden" id="newIngImage" />
+        <span id="ingImgLabel">📷 Chọn ảnh</span>
+      </div>
       <button class="btn btn-green" onclick="addIngredient()">
         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
         Thêm
@@ -361,10 +378,15 @@
       </div>
       <div class="field"><label>Mô tả ngắn</label><input id="fDesc" placeholder="Một câu mô tả hấp dẫn…" /></div>
       <div class="field">
-        <label>Ảnh món uống (URL)</label>
-        <div class="img-input-wrap">
-          <input id="fImage" placeholder="https://... (dán link ảnh vào đây)" oninput="previewImg(this.value)" />
+        <label>Ảnh món uống</label>
+        <div class="img-upload-wrap">
+          <input type="file" id="fImageFile" accept="image/*" onchange="handleImgUpload(this,'imgPreview','fImage')" style="display:none" />
+          <input type="hidden" id="fImage" />
+          <div class="img-upload-btn" onclick="document.getElementById('fImageFile').click()">
+            <span>📷 Chọn ảnh từ máy / điện thoại</span>
+          </div>
           <img class="img-preview" id="imgPreview" src="" alt="preview" />
+          <button type="button" class="img-remove-btn" id="imgRemoveBtn" onclick="removeImg('imgPreview','fImage','imgRemoveBtn')" style="display:none">✕ Xóa ảnh</button>
         </div>
       </div>
       <div class="field">
@@ -656,6 +678,8 @@
   async function deleteIngredient(name) {
     if (!confirm(`Xóa nguyên liệu "${name}"?`)) return;
     try {
+      const ingToDelete = ingredientList.find(i => i.name === name);
+      if (ingToDelete && ingToDelete.image) await deleteFromDrive(ingToDelete.image);
       await apiPost({ action:'deleteIngredient', name });
       ingredientList = ingredientList.filter(i => i.name !== name);
       renderIngredients();
@@ -755,8 +779,12 @@
       document.getElementById('fTime').value    = r.time||'';
       document.getElementById('fServing').value = r.serving||'';
       document.getElementById('fDesc').value    = r.desc||'';
-      document.getElementById('fImage').value   = r.image||'';
-      previewImg(r.image||'');
+      document.getElementById('fImage').value = r.image||'';
+      if (r.image) {
+        const prev = document.getElementById('imgPreview');
+        prev.src = r.image; prev.classList.add('show');
+        document.getElementById('imgRemoveBtn').style.display = 'inline-block';
+      }
       document.getElementById('fSteps').value   = r.steps||'';
       document.getElementById('fNotes').value   = r.notes||'';
       (r.ingredients||[]).forEach(ing => addIngredientRow(ing.name, ing.amount));
@@ -769,11 +797,16 @@
   function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); editingId = null; }
 
   function resetForm() {
-    ['fName','fEmoji','fCategory','fDifficulty','fTime','fServing','fDesc','fImage','fSteps','fNotes'].forEach(id => {
+    ['fName','fEmoji','fCategory','fDifficulty','fTime','fServing','fDesc','fSteps','fNotes'].forEach(id => {
       const el = document.getElementById(id);
       if (el.tagName==='SELECT') el.selectedIndex=0; else el.value='';
     });
     document.getElementById('ingredientRows').innerHTML = '';
+    document.getElementById('fImage').value = '';
+    document.getElementById('fImageFile').value = '';
+    const prev = document.getElementById('imgPreview');
+    prev.src=''; prev.classList.remove('show');
+    document.getElementById('imgRemoveBtn').style.display='none';
   }
 
   async function saveRecipe() {
@@ -831,6 +864,8 @@
     if (!deletingId) return;
     this.disabled=true; this.textContent='⏳ Đang xóa…';
     try {
+      const recipeToDelete = recipes.find(r => r.id === deletingId);
+      if (recipeToDelete && recipeToDelete.image) await deleteFromDrive(recipeToDelete.image);
       await apiPost({ action:'delete', id:deletingId });
       recipes = recipes.filter(r => r.id !== deletingId);
       closeConfirm(); renderCards();
@@ -851,14 +886,100 @@
   document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); closeConfirm(); } });
 
 
-  // ── Image preview ───────────────────────────────────────────────
-  function previewImg(url) {
-    const preview = document.getElementById('imgPreview');
-    if (url && url.startsWith('http')) {
-      preview.src = url;
-      preview.classList.add('show');
-    } else {
-      preview.classList.remove('show');
+  // ── Image upload to Google Drive ────────────────────────────────
+  // ── Drive image sync helpers ────────────────────────────────────
+  function getFileIdFromUrl(url) {
+    if (!url) return null;
+    const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+    return match ? match[1] : null;
+  }
+
+  async function deleteFromDrive(url) {
+    const fileId = getFileIdFromUrl(url);
+    if (!fileId) return;
+    try {
+      await fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action:'deleteImage', token:authToken, fileId })
+      });
+    } catch(e) {} // không block nếu lỗi
+  }
+
+  async function uploadToDrive(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        try {
+          const dataUrl  = e.target.result;
+          const base64   = dataUrl.split(',')[1];
+          const mimeType = file.type;
+          const fileName = file.name;
+          const res  = await fetch(API_URL, {
+            method: 'POST',
+            body: JSON.stringify({ action:'uploadImage', token:authToken, data:base64, mimeType, fileName })
+          });
+          const data = await res.json();
+          if (data.error) reject(new Error(data.error));
+          else resolve(data.url);
+        } catch(err) { reject(err); }
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function handleImgUpload(input, previewId, hiddenId) {
+    const file = input.files[0];
+    if (!file) return;
+    const btn = input.closest('.img-upload-wrap').querySelector('.img-upload-btn');
+    btn.classList.add('uploading');
+    btn.querySelector('span').textContent = '⏳ Đang upload lên Drive…';
+    try {
+      // Xóa ảnh cũ trên Drive nếu có
+      const oldUrl = document.getElementById(hiddenId).value;
+      if (oldUrl) await deleteFromDrive(oldUrl);
+      const url = await uploadToDrive(file);
+      document.getElementById(hiddenId).value = url;
+      const preview = document.getElementById(previewId);
+      preview.src = url; preview.classList.add('show');
+      const removeBtn = document.getElementById(previewId.replace('Preview','RemoveBtn'));
+      if (removeBtn) removeBtn.style.display = 'inline-block';
+      btn.querySelector('span').textContent = '✅ Ảnh đã upload thành công!';
+      showToast('✅ Upload ảnh thành công!');
+    } catch(err) {
+      showToast('❌ Upload thất bại: ' + err.message, 'err');
+      btn.querySelector('span').textContent = '📷 Chọn ảnh từ máy / điện thoại';
+    } finally {
+      btn.classList.remove('uploading');
+    }
+  }
+
+  function removeImg(previewId, hiddenId, removeBtnId) {
+    const oldUrl = document.getElementById(hiddenId).value;
+    if (oldUrl) deleteFromDrive(oldUrl); // xóa ảnh cũ khỏi Drive
+    document.getElementById(hiddenId).value = '';
+    const preview = document.getElementById(previewId);
+    preview.src = ''; preview.classList.remove('show');
+    document.getElementById(removeBtnId).style.display = 'none';
+    const wrap = preview.closest('.img-upload-wrap');
+    if (wrap) { const span = wrap.querySelector('.img-upload-btn span'); if(span) span.textContent = '📷 Chọn ảnh từ máy / điện thoại'; }
+  }
+
+  async function handleIngImgUpload(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const btn = document.getElementById('ingImgUploadBtn');
+    document.getElementById('ingImgLabel').textContent = '⏳ Đang upload…';
+    try {
+      const oldUrl = document.getElementById('newIngImage').value;
+      if (oldUrl) await deleteFromDrive(oldUrl);
+      const url = await uploadToDrive(file);
+      document.getElementById('newIngImage').value = url;
+      document.getElementById('ingImgLabel').textContent = '✅ ' + file.name;
+      btn.classList.add('has-img');
+      showToast('✅ Upload ảnh thành công!');
+    } catch(err) {
+      showToast('❌ ' + err.message, 'err');
+      document.getElementById('ingImgLabel').textContent = '📷 Chọn ảnh';
     }
   }
 
