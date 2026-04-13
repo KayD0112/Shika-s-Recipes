@@ -612,6 +612,9 @@
     }
     grid.innerHTML = list.map((r,i) => `
       <div class="card" style="animation-delay:${i*60}ms">
+        ${r.image
+          ? `<div class="card-img-wrap"><img class="card-img" src="${r.image}" alt="${r.name}" loading="lazy" referrerpolicy="no-referrer" onerror="this.closest('.card-img-wrap').innerHTML='<div class=\'card-img-placeholder\'>'+(r&&r.emoji||'🥤')+'</div>'" /></div>`
+          : `<div class="card-img-placeholder">${r.emoji||'🥤'}</div>`}
         <div class="card-header"><div class="card-icon">${r.emoji||'🥤'}</div><span class="card-badge">${r.category||'Chưa phân loại'}</span></div>
         <div class="card-title">${r.name}</div>
         ${r.desc?`<div class="card-desc">${r.desc}</div>`:''}
