@@ -893,8 +893,13 @@
   // ── Drive image sync helpers ────────────────────────────────────
   function getFileIdFromUrl(url) {
     if (!url) return null;
-    const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-    return match ? match[1] : null;
+    // https://drive.google.com/thumbnail?id=FILE_ID&sz=w800
+    const thumbnailMatch = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+    if (thumbnailMatch) return thumbnailMatch[1];
+    // https://lh3.googleusercontent.com/d/FILE_ID
+    const lhMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+    if (lhMatch) return lhMatch[1];
+    return null;
   }
 
   async function deleteFromDrive(url) {
