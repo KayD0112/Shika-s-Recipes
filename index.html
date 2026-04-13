@@ -819,6 +819,109 @@
   document.getElementById('modalOverlay').addEventListener('click', e => { if(e.target===e.currentTarget) closeModal(); });
   document.getElementById('confirmOverlay').addEventListener('click', e => { if(e.target===e.currentTarget) closeConfirm(); });
   document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); closeConfirm(); } });
+
+  // ── Auth ───────────────────────────────────────────────────────
+  function checkAuth() {
+    if (!API_URL) {
+      document.getElementById('setupBanner').classList.remove('hidden');
+      document.getElementById('loginScreen').classList.add('hidden');
+      document.getElementById('cardGrid').innerHTML = '';
+      renderStats();
+      return;
+    }
+    if (!authToken) {
+      document.getElementById('loginScreen').classList.remove('hidden');
+    } else {
+      document.getElementById('loginScreen').classList.add('hidden');
+      updateUserBadge();
+      loadAll();
+    }
+  }
+
+  function updateUserBadge() {
+    document.getElementById('userBadge').style.display = 'flex';
+    document.getElementById('userName').textContent = currentUser;
+    document.getElementById('userRoleLabel').textContent = currentRole === 'admin' ? '👑 Chủ quán' : '👤 Nhân viên';
+    document.getElementById('userAvatar').textContent = currentRole === 'admin' ? '👑' : '👤';
+    document.getElementById('addBtn').style.display = currentRole === 'admin' ? '' : 'none';
+    const ingTab = document.querySelectorAll('.page-tab')[1];
+    if (ingTab) ingTab.style.display = currentRole === 'admin' ? '' : 'none';
+  }
+
+  async function doLogin() {
+    const username = document.getElementById('loginUser').value.trim();
+    const password = document.getElementById('loginPass').value;
+    const errEl    = document.getElementById('loginError');
+    const btn      = document.getElementById('loginBtn');
+    if (!username || !password) { showLoginError('Vui lòng nhập đầy đủ thông tin'); return; }
+    if (!API_URL) { showLoginError('Chưa cấu hình Google Sheet URL'); return; }
+    btn.disabled = true; btn.textContent = '⏳ Đang đăng nhập…';
+    errEl.classList.remove('show');
+    try {
+      const loginUrl = API_URL + '?action=login&u=' + encodeURIComponent(username) + '&p=' + encodeURIComponent(password) + '&t=' + Date.now();
+      const res  = await fetch(loginUrl);
+      const data = await res.json();
+      if (data.error) { showLoginError(data.error); return; }
+      authToken   = data.token;
+      currentRole = data.role;
+      currentUser = data.displayName;
+      localStorage.setItem('shika_token', authToken);
+      localStorage.setItem('shika_role',  currentRole);
+      localStorage.setItem('shika_user',  currentUser);
+      document.getElementById('loginScreen').classList.add('hidden');
+      updateUserBadge();
+      loadAll();
+    } catch(err) {
+      showLoginError('Lỗi kết nối: ' + err.message);
+    } finally {
+      btn.disabled = false; btn.textContent = 'Đăng nhập';
+    }
+  }
+
+  function showLoginError(msg) {
+    const el = document.getElementById('loginError');
+    el.textContent = msg; el.classList.add('show');
+  }
+
+  function logout() {
+    authToken = ''; currentRole = ''; currentUser = '';
+    localStorage.removeItem('shika_token');
+    localStorage.removeItem('shika_role');
+    localStorage.removeItem('shika_user');
+    recipes = []; ingredientList = [];
+    document.getElementById('loginScreen').classList.remove('hidden');
+    document.getElementById('userBadge').style.display = 'none';
+    document.getElementById('loginUser').value = '';
+    document.getElementById('loginPass').value = '';
+    document.getElementById('loginError').classList.remove('show');
+    document.getElementById('cardGrid').innerHTML = '';
+    renderStats();
+  }
+
+  function isAdmin() { return currentRole === 'admin'; }
+
+  function openChpw() { document.getElementById('chpwOverlay').classList.add('open'); }
+
+  async function doChangePassword() {
+    const np  = document.getElementById('chpwNew').value;
+    const cp  = document.getElementById('chpwConfirm').value;
+    const err = document.getElementById('chpwError');
+    if (!np) { err.textContent='Mật khẩu không được trống'; err.classList.add('show'); return; }
+    if (np !== cp) { err.textContent='Mật khẩu không khớp'; err.classList.add('show'); return; }
+    try {
+      await apiPost({ action:'changePassword', newPassword: np });
+      document.getElementById('chpwOverlay').classList.remove('open');
+      document.getElementById('chpwNew').value = '';
+      document.getElementById('chpwConfirm').value = '';
+      err.classList.remove('show');
+      showToast('✅ Đã đổi mật khẩu!');
+    } catch(e) { err.textContent = e.message; err.classList.add('show'); }
+  }
+
+  document.getElementById('chpwOverlay').addEventListener('click', e => {
+    if (e.target === e.currentTarget) e.currentTarget.classList.remove('open');
+  });
+
 </script>
 
 <!-- Login Screen -->
