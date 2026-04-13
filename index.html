@@ -200,6 +200,40 @@
       .field-row{grid-template-columns:1fr;}
       .search-input{width:160px;}
     }
+
+    /* ── Login Screen ── */
+    .login-screen { position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px; }
+    .login-screen.hidden { display:none; }
+    .login-box { background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:48px 40px;width:100%;max-width:420px;display:flex;flex-direction:column;gap:24px;position:relative;overflow:hidden; }
+    .login-box::before { content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,.15),transparent 70%);pointer-events:none; }
+    .login-logo { font-family:'Playfair Display',serif;font-size:36px;color:var(--gold-light);text-align:center;line-height:1.2; }
+    .login-logo em { font-style:italic;color:var(--text-muted); }
+    .login-subtitle { font-size:13px;color:var(--text-muted);text-align:center;margin-top:-12px; }
+    .login-field { display:flex;flex-direction:column;gap:8px; }
+    .login-field label { font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);font-weight:500; }
+    .login-field input { background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;padding:14px 16px;border-radius:12px;outline:none;transition:border-color .2s,box-shadow .2s;width:100%; }
+    .login-field input:focus { border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.12); }
+    .login-field input::placeholder { color:var(--text-muted); }
+    .login-btn { background:var(--gold);color:#1a1200;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;padding:14px;border-radius:12px;border:none;cursor:pointer;transition:all .2s;letter-spacing:.02em; }
+    .login-btn:hover { background:var(--gold-light);transform:translateY(-1px);box-shadow:0 8px 24px rgba(201,168,76,.3); }
+    .login-btn:disabled { opacity:.6;cursor:not-allowed;transform:none; }
+    .login-error { background:rgba(212,92,74,.12);border:1px solid rgba(212,92,74,.3);border-radius:10px;padding:10px 14px;font-size:13px;color:var(--red);text-align:center;display:none; }
+    .login-error.show { display:block; }
+
+    /* ── User badge in header ── */
+    .user-badge { display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:99px;padding:6px 16px 6px 10px; }
+    .user-avatar { width:28px;height:28px;border-radius:50%;background:var(--gold-dim);border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:13px; }
+    .user-info { display:flex;flex-direction:column;gap:1px; }
+    .user-name { font-size:13px;font-weight:500;color:var(--text);line-height:1; }
+    .user-role { font-size:10px;color:var(--text-muted);letter-spacing:.05em; }
+    .logout-btn { background:transparent;border:none;color:var(--text-muted);cursor:pointer;font-size:12px;padding:2px 4px;border-radius:4px;transition:color .15s; }
+    .logout-btn:hover { color:var(--red); }
+
+    /* ── Change password modal ── */
+    .chpw-overlay { position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .2s; }
+    .chpw-overlay.open { opacity:1;pointer-events:all; }
+    .chpw-box { background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;max-width:360px;width:100%;display:flex;flex-direction:column;gap:18px; }
+    .chpw-title { font-family:'Playfair Display',serif;font-size:22px;color:var(--gold-light); }
   </style>
 </head>
 <body>
@@ -211,6 +245,12 @@
   </div>
   <div class="header-actions">
     <span class="saving-badge" id="savingBadge">⏳ Đang lưu…</span>
+    <div class="user-badge" id="userBadge" style="display:none">
+      <div class="user-avatar" id="userAvatar">👤</div>
+      <div class="user-info"><div class="user-name" id="userName"></div><div class="user-role" id="userRoleLabel"></div></div>
+      <button class="logout-btn" onclick="openChpw()" title="Đổi mật khẩu">🔑</button>
+      <button class="logout-btn" onclick="logout()" title="Đăng xuất">⏏</button>
+    </div>
     <div class="page-tabs">
       <button class="page-tab active" onclick="switchPage('recipes')">🍹 Công thức</button>
       <button class="page-tab" onclick="switchPage('ingredients')">🧪 Nguyên liệu</button>
@@ -344,6 +384,9 @@
   // ── State ──────────────────────────────────────────────────────
   const API_KEY = 'sip_craft_api_url';
   let API_URL = localStorage.getItem(API_KEY) || '';
+  let authToken = localStorage.getItem('shika_token') || '';
+  let currentRole = localStorage.getItem('shika_role') || '';
+  let currentUser = localStorage.getItem('shika_user') || '';
   let recipes = [];
   let ingredientList = []; // [{name, unit}]
   let editingId = null;
@@ -392,7 +435,7 @@
     try {
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), 15000);
-      const res  = await fetch(API_URL + '?t=' + Date.now(), { signal: controller.signal });
+      const res  = await fetch(API_URL + '?t=' + Date.now() + '&token=' + encodeURIComponent(authToken), { signal: controller.signal });
       clearTimeout(timer);
       const text = await res.text();
       let data;
@@ -430,6 +473,7 @@
   async function apiPost(body) {
     setSaving(true);
     try {
+      body.token = authToken;
       const res  = await fetch(API_URL, { method:'POST', body: JSON.stringify(body) });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
@@ -776,5 +820,32 @@
   document.getElementById('confirmOverlay').addEventListener('click', e => { if(e.target===e.currentTarget) closeConfirm(); });
   document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); closeConfirm(); } });
 </script>
+
+<!-- Login Screen -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">Shika<em>'s</em> Recipes</div>
+    <div class="login-subtitle">✦ Đăng nhập để tiếp tục</div>
+    <div class="login-field"><label>Tên đăng nhập</label><input id="loginUser" type="text" placeholder="Nhập tên đăng nhập…" autocomplete="username" /></div>
+    <div class="login-field"><label>Mật khẩu</label><input id="loginPass" type="password" placeholder="Nhập mật khẩu…" autocomplete="current-password" /></div>
+    <div class="login-error" id="loginError"></div>
+    <button class="login-btn" id="loginBtn" onclick="doLogin()">Đăng nhập</button>
+  </div>
+</div>
+
+<!-- Change Password -->
+<div class="chpw-overlay" id="chpwOverlay">
+  <div class="chpw-box">
+    <div class="chpw-title">🔑 Đổi mật khẩu</div>
+    <div class="login-field"><label>Mật khẩu mới</label><input id="chpwNew" type="password" placeholder="Nhập mật khẩu mới…" /></div>
+    <div class="login-field"><label>Xác nhận mật khẩu</label><input id="chpwConfirm" type="password" placeholder="Nhập lại mật khẩu…" /></div>
+    <div class="login-error" id="chpwError"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button class="btn btn-ghost" onclick="document.getElementById('chpwOverlay').classList.remove('open')">Hủy</button>
+      <button class="btn btn-gold" onclick="doChangePassword()">Lưu</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
