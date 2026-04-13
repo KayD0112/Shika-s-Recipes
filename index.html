@@ -426,7 +426,7 @@
   // ── State ──────────────────────────────────────────────────────
   const API_KEY = 'sip_craft_api_url';
   // ⚙️ Nhúng URL vào đây để dùng trên mọi thiết bị không cần nhập lại
-  const DEFAULT_API_URL = 'ĐẶT_URL_CỦA_BẠN_VÀO_ĐÂY';
+  const DEFAULT_API_URL = 'https://script.google.com/macros/s/AKfycbwS0qGoRT0aRhydsGP0O9a462gpcy59mN_MlbUjFUQfWyI-uT_W3AInqzdlIwnA6-ML/exec';
   let API_URL = localStorage.getItem(API_KEY) || (DEFAULT_API_URL.startsWith('https') ? DEFAULT_API_URL : '');
   if (API_URL && !localStorage.getItem(API_KEY)) localStorage.setItem(API_KEY, API_URL);
   let authToken = localStorage.getItem('shika_token') || '';
